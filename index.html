@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bonair Technic - Mail İmzası Oluşturucu</title>
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="shortcut icon" href="favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #0A1628;
+    color: #E8EDF4;
+    min-height: 100vh;
+    padding: 32px 16px;
+  }
+  .container { max-width: 1040px; margin: 0 auto; }
+  .header { text-align: center; margin-bottom: 32px; }
+  .header img { height: 48px; margin-bottom: 12px; }
+  .header h1 { font-size: 24px; font-weight: 800; }
+  .header p { color: #8FA3BF; font-size: 14px; margin-top: 6px; }
+  .grid { display: grid; grid-template-columns: 340px 1fr; gap: 24px; align-items: start; }
+  @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+  .card {
+    background: #12233D;
+    border: 1px solid #1E3355;
+    border-radius: 14px;
+    padding: 24px;
+  }
+  .card h2 { font-size: 15px; font-weight: 700; margin-bottom: 16px; color: #B9C8DD; }
+  .form-group { margin-bottom: 16px; }
+  .form-group label { display: block; font-size: 13px; font-weight: 600; color: #8FA3BF; margin-bottom: 6px; }
+  .form-group input {
+    width: 100%;
+    padding: 11px 13px;
+    border-radius: 9px;
+    border: 1px solid #2A4166;
+    background: #0A1628;
+    color: #E8EDF4;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color .15s;
+  }
+  .form-group input:focus { border-color: #4A90D9; }
+  .form-group input.invalid { border-color: #D95757; }
+  .hint { font-size: 12px; color: #5F7494; margin-top: 5px; }
+  .preview-wrap {
+    background: #FFFFFF;
+    border-radius: 10px;
+    padding: 22px;
+    overflow-x: auto;
+  }
+  .btn-row { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+  button {
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 12px 18px;
+    border-radius: 9px;
+    border: none;
+    cursor: pointer;
+    transition: opacity .15s, transform .1s;
+  }
+  button:hover { opacity: .9; }
+  button:active { transform: scale(.98); }
+  button:disabled { opacity: .4; cursor: not-allowed; }
+  .btn-primary { background: #4A90D9; color: #fff; flex: 1; min-width: 180px; }
+  .btn-secondary { background: #1E3355; color: #B9C8DD; }
+  .toast {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #1F9D61;
+    color: #fff;
+    padding: 12px 22px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .25s, transform .25s;
+    z-index: 50;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .steps { margin-top: 18px; font-size: 13px; color: #8FA3BF; line-height: 1.7; }
+  .steps strong { color: #B9C8DD; }
+  .steps ol { padding-left: 18px; margin-top: 6px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <img src="bonair-logo.png" alt="Bonair Technic">
+    <h1>Mail İmzası Oluşturucu</h1>
+    <p>Bilgilerinizi girin, kurumsal imzanız taslağa uygun şekilde otomatik oluşsun. Tek tıkla kopyalayıp mail programınıza yapıştırın.</p>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Bilgileriniz</h2>
+      <div class="form-group">
+        <label for="fullName">Ad Soyad</label>
+        <input id="fullName" type="text" placeholder="Asya TEMÜR" autocomplete="name" maxlength="60">
+        <div class="hint">Soyadınızı BÜYÜK harfle yazabilirsiniz.</div>
+      </div>
+      <div class="form-group">
+        <label for="title">Unvan</label>
+        <input id="title" type="text" placeholder="Compliance Monitoring &amp; SMS Engineer" autocomplete="organization-title" maxlength="80">
+      </div>
+      <div class="form-group">
+        <label for="email">E-posta</label>
+        <input id="email" type="email" placeholder="atemur@bonair.com.tr" autocomplete="email" maxlength="80">
+      </div>
+      <div class="form-group">
+        <label for="phone">Telefon</label>
+        <input id="phone" type="tel" placeholder="+90 530 042 31 32" autocomplete="tel" maxlength="25">
+        <div class="hint">Örn: +90 530 042 31 32</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Önizleme</h2>
+      <div class="preview-wrap" id="previewWrap"></div>
+      <div class="btn-row">
+        <button class="btn-primary" id="copyBtn">İmzayı Kopyala</button>
+        <button class="btn-secondary" id="copyHtmlBtn">HTML Kodunu Kopyala</button>
+      </div>
+      <div class="steps">
+        <strong>Nasıl kullanılır?</strong>
+        <ol>
+          <li><strong>Gmail:</strong> Ayarlar → Tüm ayarları göster → İmza → Yeni oluştur → kutuya yapıştırın (Ctrl+V / Cmd+V).</li>
+          <li><strong>Outlook:</strong> Ayarlar → Hesaplar → İmzalar → Yeni imza → yapıştırın.</li>
+          <li>Görseller görünmüyorsa "HTML Kodunu Kopyala" ile HTML modunda ekleyin.</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast">Kopyalandı!</div>
+
+<script>
+(function() {
+  // Kopyalanan imzada gorseller mutlak URL ister (mail istemcisi goreli yolu cozemez).
+  // Onizlemede goreli yol kullanilir; kopyalarken BASE ile mutlak yapilir.
+  // BASE otomatik: site hangi adreste yayindaysa gorseller de oradan servis edilir.
+  // Boylece Firebase/Vercel/Netlify farketmeksizin dogru calisir; sadece yerelde
+  // (file://) test edilirken yedek bir mutlak adres kullanilir.
+  var BASE = (location.protocol === 'http:' || location.protocol === 'https:')
+    ? location.origin + '/'
+    : 'https://bonair-mail-imza.web.app/';
+
+  // Sabit kurumsal bilgiler (herkes icin ayni).
+  var COMPANY = 'Bonair Technic';
+  var WEB_TEXT = 'www.bonair.com.tr';
+  var WEB_URL = 'https://www.bonair.com.tr';
+  var ADDRESS = 'Şenlikköy, Orman Sk. No: 10, 34153 Bakırköy/İstanbul';
+  var SOCIAL = [
+    { img: 'imza-ig.png',     url: 'https://www.instagram.com/bonairfly/',                                                     alt: 'Instagram' },
+    { img: 'imza-in.png',     url: 'https://www.linkedin.com/company/bonair-havac%C4%B1l%C4%B1k/posts/?feedView=all',          alt: 'LinkedIn' },
+    { img: 'imza-globe.png',  url: 'https://bonair.com.tr/',                                                                   alt: 'Web' },
+    { img: 'imza-pdf.png',    url: 'https://www.bonair.com.tr/wp-content/uploads/2026/01/BONAIR-COMPANY-PRESENTATION-Jan2026-Rev04.pdf', alt: 'Şirket Sunumu' }
+  ];
+  var DISCLAIMER = 'CONFIDENTIAL: This email is intended solely for the addressee. Unauthorized use is prohibited. If received in error, please notify the sender and delete. BonAir Aviation accepts no liability for errors or viruses.';
+
+  var NAME_COLOR = '#20242B';
+  var GRAY = '#6B7075';
+  var LIGHT_GRAY = '#8A8F94';
+  var LINK = '#6B7075';
+
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function(c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function contactRow(iconUrl, alt, text, href) {
+    var inner = href
+      ? '<a href="' + esc(href) + '" style="color:' + LINK + ';text-decoration:none;">' + esc(text) + '</a>'
+      : esc(text);
+    return '' +
+      '<tr>' +
+        '<td style="padding:2px 8px 2px 0;vertical-align:middle;">' +
+          '<img src="' + iconUrl + '" alt="' + alt + '" width="16" height="16" style="display:block;width:16px;height:16px;border:0;">' +
+        '</td>' +
+        '<td style="vertical-align:middle;font-size:13px;color:' + GRAY + ';line-height:1.4;">' + inner + '</td>' +
+      '</tr>';
+  }
+
+  // E-posta istemcileri icin guvenli: tablo tabanli, tum stiller inline.
+  function buildSignature(v, base) {
+    base = base || '';
+    var telHref = 'tel:' + String(v.phone).replace(/[^+\d]/g, '');
+    var socialCells = SOCIAL.map(function(s) {
+      return '<a href="' + s.url + '" target="_blank" style="text-decoration:none;">' +
+             '<img src="' + base + s.img + '" alt="' + s.alt + '" width="22" height="22" style="display:block;width:22px;height:22px;border:0;margin:0 0 10px 0;">' +
+             '</a>';
+    }).join('');
+
+    return '' +
+    '<table cellpadding="0" cellspacing="0" border="0" width="716" style="width:716px;font-family:Arial,Helvetica,sans-serif;border-collapse:collapse;table-layout:fixed;">' +
+      '<tr>' +
+        // SOL: logo + isim + unvan + iletisim
+        '<td width="356" style="width:356px;vertical-align:top;padding:0 20px 0 0;">' +
+          '<img src="' + base + 'bonair-logo.png" alt="' + COMPANY + '" width="140" style="display:block;width:140px;height:auto;border:0;margin-bottom:14px;">' +
+          '<div style="font-size:26px;font-weight:bold;color:' + NAME_COLOR + ';line-height:1.05;">' + esc(v.name) + '</div>' +
+          '<div style="font-size:13px;color:' + GRAY + ';padding:3px 0 14px 0;">' + esc(v.title) + '</div>' +
+          '<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">' +
+            contactRow(base + 'imza-ic-mail.png', 'E-posta', v.email, 'mailto:' + v.email) +
+            contactRow(base + 'imza-ic-web.png', 'Web', WEB_TEXT, WEB_URL) +
+            contactRow(base + 'imza-ic-phone.png', 'Telefon', v.phone, telHref) +
+          '</table>' +
+        '</td>' +
+        // ORTA: bina illustrasyonu
+        '<td width="326" style="width:326px;vertical-align:bottom;padding:0 6px 0 0;">' +
+          '<img src="' + base + 'imza-building.png" alt="Bonair" width="320" style="display:block;width:320px;height:auto;border:0;">' +
+        '</td>' +
+        // SAG: sosyal / link ikonlari (dikey)
+        '<td width="34" style="width:34px;vertical-align:top;padding:2px 0 0 6px;">' + socialCells + '</td>' +
+      '</tr>' +
+      '<tr>' +
+        '<td colspan="3" style="padding:8px 0 0 0;font-size:12px;color:' + LIGHT_GRAY + ';">' + esc(ADDRESS) + '</td>' +
+      '</tr>' +
+    '</table>' +
+    '<div style="max-width:660px;font-family:Arial,Helvetica,sans-serif;font-size:11px;color:' + LIGHT_GRAY + ';line-height:1.5;margin-top:10px;">' +
+      esc(DISCLAIMER) + ' | ' +
+      '<a href="' + WEB_URL + '" style="color:' + LINK + ';text-decoration:none;">bonair.com.tr</a>' +
+    '</div>';
+  }
+
+  var nameEl = document.getElementById('fullName');
+  var titleEl = document.getElementById('title');
+  var emailEl = document.getElementById('email');
+  var phoneEl = document.getElementById('phone');
+  var previewWrap = document.getElementById('previewWrap');
+  var copyBtn = document.getElementById('copyBtn');
+  var copyHtmlBtn = document.getElementById('copyHtmlBtn');
+  var toast = document.getElementById('toast');
+  var toastTimer = null;
+
+  function values() {
+    return {
+      name: nameEl.value.trim() || 'Ad Soyad',
+      title: titleEl.value.trim() || 'Unvan',
+      email: emailEl.value.trim() || 'ornek@bonair.com.tr',
+      phone: phoneEl.value.trim() || '+90 5xx xxx xx xx'
+    };
+  }
+
+  function isReady() {
+    var emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailEl.value.trim());
+    emailEl.classList.toggle('invalid', emailEl.value.trim() !== '' && !emailOk);
+    return nameEl.value.trim() !== '' && titleEl.value.trim() !== '' && emailOk && phoneEl.value.trim() !== '';
+  }
+
+  function render() {
+    previewWrap.innerHTML = buildSignature(values(), '');
+    var ready = isReady();
+    copyBtn.disabled = !ready;
+    copyHtmlBtn.disabled = !ready;
+  }
+
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function() { toast.classList.remove('show'); }, 2400);
+  }
+
+  function currentHtml() {
+    return buildSignature(values(), BASE);
+  }
+
+  copyBtn.addEventListener('click', function() {
+    var html = currentHtml();
+    var v = values();
+    var plain = v.name + '\n' + v.title + '\n' + COMPANY +
+                '\nE-posta: ' + v.email + '\nWeb: ' + WEB_TEXT + '\nTelefon: ' + v.phone +
+                '\n' + ADDRESS;
+    if (navigator.clipboard && window.ClipboardItem) {
+      navigator.clipboard.write([new ClipboardItem({
+        'text/html': new Blob([html], { type: 'text/html' }),
+        'text/plain': new Blob([plain], { type: 'text/plain' })
+      })]).then(function() {
+        showToast('İmza kopyalandı! Mail ayarlarınıza yapıştırabilirsiniz.');
+      }).catch(fallbackCopy);
+    } else {
+      fallbackCopy();
+    }
+    // Eski tarayicilar: mutlak URL'li imzayi gizli bir kutuya basip secip kopyala.
+    function fallbackCopy() {
+      var holder = document.createElement('div');
+      holder.style.cssText = 'position:fixed;left:-9999px;top:0;';
+      holder.innerHTML = html;
+      document.body.appendChild(holder);
+      var range = document.createRange();
+      range.selectNodeContents(holder);
+      var sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      var ok = false;
+      try { ok = document.execCommand('copy'); } catch (e) {}
+      sel.removeAllRanges();
+      document.body.removeChild(holder);
+      showToast(ok ? 'İmza kopyalandı!' : 'Kopyalanamadı, HTML kodunu kullanın.');
+    }
+  });
+
+  copyHtmlBtn.addEventListener('click', function() {
+    var html = currentHtml();
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(html).then(function() {
+        showToast('HTML kodu kopyalandı!');
+      });
+    } else {
+      var ta = document.createElement('textarea');
+      ta.value = html;
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); showToast('HTML kodu kopyalandı!'); } catch (e) {}
+      document.body.removeChild(ta);
+    }
+  });
+
+  [nameEl, titleEl, emailEl, phoneEl].forEach(function(el) {
+    el.addEventListener('input', render);
+  });
+  render();
+})();
+</script>
+</body>
+</html>
