@@ -6,6 +6,9 @@
 <title>Bonair - Mail İmzası Oluşturucu</title>
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="shortcut icon" href="favicon.ico">
+<link rel="preload" href="fonts/glacial-indifference-700.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/glacial-indifference-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="imza-sablon.png" as="image">
 <style>
   /* Imza fotografinda kullanilan fontlar (sitede barindirilir, disari bagimlilik yok).
      Glacial Indifference = Canva'daki orijinal font. Turkce Ş/Ğ/İ/ı icin Jost yedek. */
@@ -191,24 +194,38 @@
     return canvas.toDataURL('image/png');
   }
 
-  // Imza HTML'i: [fotograf | sosyal ikon sutunu] + gizlilik satiri
+  // Imza HTML'i: [fotograf | sosyal ikon sutunu] + gizlilik satiri.
+  // Outlook'un Word tabanli motoru CSS'in cogunu ezer; bu yuzden yerlesim
+  // tamamen tablo + HTML attribute'lariyla kurulur:
+  //  - her ikon AYRI tablo satirinda, sabit satir yuksekligi (height=34) -> esit aralik
+  //  - fotografta width VE height attribute birlikte -> Outlook yeniden olcekleyemez
+  //  - gizlilik metni <font size="1"> ile (inline font-size ezilse bile kucuk kalir)
+  var PHOTO_H = Math.round(438 / 1313 * 573);  // 191
   function buildSignature(photoSrc, iconBase) {
-    var icons = SOCIAL.map(function(s) {
-      return '<a href="' + s.url + '" target="_blank" style="text-decoration:none;">' +
-             '<img src="' + iconBase + s.img + '" alt="' + s.alt + '" width="22" height="22" style="display:block;width:22px;height:22px;border:0;margin:0 0 9px 0;">' +
-             '</a>';
+    var iconRows = SOCIAL.map(function(s, i) {
+      var last = (i === SOCIAL.length - 1);
+      return '<tr><td height="' + (last ? 22 : 34) + '" width="24" align="left" valign="top" style="height:' + (last ? 22 : 34) + 'px;">' +
+             '<a href="' + s.url + '" target="_blank" style="text-decoration:none;border:0;">' +
+             '<img src="' + iconBase + s.img + '" alt="' + s.alt + '" width="22" height="22" border="0" style="display:block;width:22px;height:22px;border:0;">' +
+             '</a></td></tr>';
     }).join('');
     return '' +
-    '<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">' +
+    '<table cellpadding="0" cellspacing="0" border="0" width="' + (PHOTO_W + 14 + 24) + '" style="border-collapse:collapse;width:' + (PHOTO_W + 14 + 24) + 'px;">' +
       '<tr>' +
-        '<td style="vertical-align:top;padding:0 14px 0 0;">' +
-          '<img src="' + photoSrc + '" alt="Bonair" width="' + PHOTO_W + '" style="display:block;width:' + PHOTO_W + 'px;height:auto;border:0;">' +
+        '<td width="' + PHOTO_W + '" valign="top" style="width:' + PHOTO_W + 'px;vertical-align:top;">' +
+          '<img src="' + photoSrc + '" alt="Bonair" width="' + PHOTO_W + '" height="' + PHOTO_H + '" border="0" style="display:block;width:' + PHOTO_W + 'px;height:' + PHOTO_H + 'px;border:0;">' +
         '</td>' +
-        '<td style="vertical-align:top;padding-top:2px;width:24px;">' + icons + '</td>' +
+        '<td width="14" style="width:14px;font-size:1px;line-height:1px;">&nbsp;</td>' +
+        '<td width="24" valign="top" style="width:24px;vertical-align:top;padding-top:2px;">' +
+          '<table cellpadding="0" cellspacing="0" border="0" width="24" style="border-collapse:collapse;">' + iconRows + '</table>' +
+        '</td>' +
       '</tr>' +
       '<tr>' +
-        '<td colspan="2" style="padding:10px 0 0 0;font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#8A8F94;line-height:1.5;">' +
+        '<td colspan="3" style="padding:10px 0 0 0;">' +
+          '<font face="Arial, Helvetica, sans-serif" size="1" color="#8A8F94">' +
+          '<span style="font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#8A8F94;line-height:1.5;">' +
           esc(DISCLAIMER) + ' | <a href="' + WEB_URL + '" style="color:#8A8F94;">bonair.com.tr</a>' +
+          '</span></font>' +
         '</td>' +
       '</tr>' +
     '</table>';
@@ -316,16 +333,32 @@
 
   [nameEl, titleEl, emailEl, phoneEl].forEach(function(el) { el.addEventListener('input', render); });
 
-  // Fontlar + sablon hazir olunca ilk cizim
+  // Fontlar + sablon hazir olunca ilk cizim. Fontlarin GERCEKTEN indigi
+  // dogrulanmadan fotograf uretilmez (yanlis fontlu imza olusmasin).
   template.onload = function() { templateReady = true; render(); };
-  if (template.complete) { templateReady = true; }
-  Promise.all([
-    document.fonts.load("62px 'GlacialB'"),
-    document.fonts.load("21px 'GlacialR'"),
-    document.fonts.load("62px 'JostSemi'"),
-    document.fonts.load("21px 'JostReg'")
-  ]).then(function() { fontsReady = true; render(); })
-    .catch(function() { fontsReady = true; render(); });
+  if (template.complete && template.naturalWidth) { templateReady = true; }
+  var fontTry = 0;
+  function loadFonts() {
+    fontTry++;
+    Promise.all([
+      document.fonts.load("62px 'GlacialB'"),
+      document.fonts.load("21px 'GlacialR'"),
+      document.fonts.load("62px 'JostSemi'"),
+      document.fonts.load("21px 'JostReg'")
+    ]).then(function() {
+      if (document.fonts.check("62px 'GlacialB'") && document.fonts.check("21px 'GlacialR'")) {
+        fontsReady = true; render();
+      } else if (fontTry < 30) {
+        setTimeout(loadFonts, 400);
+      } else {
+        showToast('Yazı tipi yüklenemedi — sayfayı yenileyin (Ctrl+F5).');
+      }
+    }).catch(function() {
+      if (fontTry < 30) setTimeout(loadFonts, 400);
+      else showToast('Yazı tipi yüklenemedi — sayfayı yenileyin (Ctrl+F5).');
+    });
+  }
+  loadFonts();
 })();
 </script>
 </body>
