@@ -3,48 +3,41 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bonair Technic - Mail İmzası Oluşturucu</title>
+<title>Bonair - Mail İmzası Oluşturucu</title>
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="shortcut icon" href="favicon.ico">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Questrial&family=Jost:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+  /* Imza fotografinda kullanilan fontlar (sitede barindirilir, disari bagimlilik yok).
+     Glacial Indifference = Canva'daki orijinal font. Turkce Ş/Ğ/İ/ı icin Jost yedek. */
+  @font-face { font-family: 'GlacialB'; src: url('fonts/glacial-indifference-700.woff2') format('woff2'); }
+  @font-face { font-family: 'GlacialR'; src: url('fonts/glacial-indifference-400.woff2') format('woff2'); }
+  @font-face { font-family: 'JostSemi'; src: url('fonts/jost-latin-600-normal.woff2') format('woff2'); }
+  @font-face { font-family: 'JostSemi'; src: url('fonts/jost-latin-ext-600-normal.woff2') format('woff2'); unicode-range: U+0100-024F; }
+  @font-face { font-family: 'JostReg'; src: url('fonts/jost-latin-400-normal.woff2') format('woff2'); }
+  @font-face { font-family: 'JostReg'; src: url('fonts/jost-latin-ext-400-normal.woff2') format('woff2'); unicode-range: U+0100-024F; }
+
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Segoe UI', Arial, sans-serif;
     background: #0A1628;
     color: #E8EDF4;
     min-height: 100vh;
     padding: 32px 16px;
   }
-  .container { max-width: 1040px; margin: 0 auto; }
+  .container { max-width: 1060px; margin: 0 auto; }
   .header { text-align: center; margin-bottom: 32px; }
-  .header img { height: 48px; margin-bottom: 12px; }
   .header h1 { font-size: 24px; font-weight: 800; }
   .header p { color: #8FA3BF; font-size: 14px; margin-top: 6px; }
-  .grid { display: grid; grid-template-columns: 340px 1fr; gap: 24px; align-items: start; }
-  @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
-  .card {
-    background: #12233D;
-    border: 1px solid #1E3355;
-    border-radius: 14px;
-    padding: 24px;
-  }
+  .grid { display: grid; grid-template-columns: 330px 1fr; gap: 24px; align-items: start; }
+  @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+  .card { background: #12233D; border: 1px solid #1E3355; border-radius: 14px; padding: 24px; }
   .card h2 { font-size: 15px; font-weight: 700; margin-bottom: 16px; color: #B9C8DD; }
   .form-group { margin-bottom: 16px; }
   .form-group label { display: block; font-size: 13px; font-weight: 600; color: #8FA3BF; margin-bottom: 6px; }
   .form-group input {
-    width: 100%;
-    padding: 11px 13px;
-    border-radius: 9px;
-    border: 1px solid #2A4166;
-    background: #0A1628;
-    color: #E8EDF4;
-    font-size: 14px;
-    font-family: inherit;
-    outline: none;
-    transition: border-color .15s;
+    width: 100%; padding: 11px 13px; border-radius: 9px;
+    border: 1px solid #2A4166; background: #0A1628; color: #E8EDF4;
+    font-size: 14px; font-family: inherit; outline: none; transition: border-color .15s;
   }
   .form-group input:focus { border-color: #4A90D9; }
   .form-group input.invalid { border-color: #D95757; }
@@ -52,47 +45,24 @@
   .preview-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
   .preview-head h2 { margin-bottom: 0; }
   .mode-toggle { display: inline-flex; background: #0A1628; border: 1px solid #2A4166; border-radius: 8px; overflow: hidden; }
-  .mode-toggle button { padding: 6px 12px; font-size: 12px; font-weight: 600; background: transparent; color: #8FA3BF; border-radius: 0; }
+  .mode-toggle button { padding: 6px 12px; font-size: 12px; font-weight: 600; background: transparent; color: #8FA3BF; border: none; cursor: pointer; }
   .mode-toggle button.active { background: #4A90D9; color: #fff; }
-  .preview-wrap {
-    border-radius: 10px;
-    padding: 22px;
-    overflow-x: auto;
-    transition: background .15s;
-  }
+  .preview-wrap { border-radius: 10px; padding: 18px; overflow-x: auto; transition: background .15s; }
   .preview-wrap.preview-light { background: #FFFFFF; }
   .preview-wrap.preview-dark { background: #232427; }
   .btn-row { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
-  button {
-    font-family: inherit;
-    font-size: 14px;
-    font-weight: 700;
-    padding: 12px 18px;
-    border-radius: 9px;
-    border: none;
-    cursor: pointer;
-    transition: opacity .15s, transform .1s;
-  }
+  button { font-family: inherit; font-size: 14px; font-weight: 700; padding: 12px 18px; border-radius: 9px; border: none; cursor: pointer; transition: opacity .15s, transform .1s; }
   button:hover { opacity: .9; }
   button:active { transform: scale(.98); }
   button:disabled { opacity: .4; cursor: not-allowed; }
-  .btn-primary { background: #4A90D9; color: #fff; flex: 1; min-width: 180px; }
+  .btn-primary { background: #4A90D9; color: #fff; flex: 1; min-width: 170px; }
   .btn-secondary { background: #1E3355; color: #B9C8DD; }
   .toast {
-    position: fixed;
-    bottom: 28px;
-    left: 50%;
+    position: fixed; bottom: 28px; left: 50%;
     transform: translateX(-50%) translateY(20px);
-    background: #1F9D61;
-    color: #fff;
-    padding: 12px 22px;
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 600;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity .25s, transform .25s;
-    z-index: 50;
+    background: #1F9D61; color: #fff; padding: 12px 22px; border-radius: 10px;
+    font-size: 14px; font-weight: 600; opacity: 0; pointer-events: none;
+    transition: opacity .25s, transform .25s; z-index: 50; max-width: 90vw; text-align: center;
   }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   .steps { margin-top: 18px; font-size: 13px; color: #8FA3BF; line-height: 1.7; }
@@ -103,9 +73,8 @@
 <body>
 <div class="container">
   <div class="header">
-    <img src="bonair-logo-email.png" alt="Bonair Technic">
-    <h1>Mail İmzası Oluşturucu</h1>
-    <p>Bilgilerinizi girin, kurumsal imzanız taslağa uygun şekilde otomatik oluşsun. Tek tıkla kopyalayıp mail programınıza yapıştırın.</p>
+    <h1>Bonair Mail İmzası Oluşturucu</h1>
+    <p>Bilgilerinizi girin; imzanız kurumsal şablon üzerine <strong>fotoğraf olarak</strong> oluşturulur — font ve tasarım her mail programında birebir aynı görünür.</p>
   </div>
 
   <div class="grid">
@@ -113,21 +82,20 @@
       <h2>Bilgileriniz</h2>
       <div class="form-group">
         <label for="fullName">Ad Soyad</label>
-        <input id="fullName" type="text" placeholder="Asya TEMÜR" autocomplete="name" maxlength="60">
-        <div class="hint">Soyadınızı BÜYÜK harfle yazabilirsiniz.</div>
+        <input id="fullName" type="text" placeholder="Asya TEMÜR" autocomplete="name" maxlength="40">
+        <div class="hint">Taslaktaki gibi soyadı BÜYÜK yazabilirsiniz.</div>
       </div>
       <div class="form-group">
         <label for="title">Unvan</label>
-        <input id="title" type="text" placeholder="Compliance Monitoring &amp; SMS Engineer" autocomplete="organization-title" maxlength="80">
+        <input id="title" type="text" placeholder="Compliance Monitoring &amp; SMS Engineer" maxlength="60">
       </div>
       <div class="form-group">
         <label for="email">E-posta</label>
-        <input id="email" type="email" placeholder="atemur@bonair.com.tr" autocomplete="email" maxlength="80">
+        <input id="email" type="email" placeholder="atemur@bonair.com.tr" autocomplete="email" maxlength="50">
       </div>
       <div class="form-group">
         <label for="phone">Telefon</label>
         <input id="phone" type="tel" placeholder="+90 530 042 31 32" autocomplete="tel" maxlength="25">
-        <div class="hint">Örn: +90 530 042 31 32</div>
       </div>
     </div>
 
@@ -135,61 +103,62 @@
       <div class="preview-head">
         <h2>Önizleme</h2>
         <div class="mode-toggle" id="modeToggle">
-          <button type="button" data-mode="dark" class="active">Koyu mail</button>
-          <button type="button" data-mode="light">Açık mail</button>
+          <button type="button" data-mode="light" class="active">Açık mail</button>
+          <button type="button" data-mode="dark">Koyu mail</button>
         </div>
       </div>
-      <div class="preview-wrap preview-dark" id="previewWrap"></div>
+      <div class="preview-wrap preview-light" id="previewWrap"></div>
       <div class="btn-row">
         <button class="btn-primary" id="copyBtn">İmzayı Kopyala</button>
-        <button class="btn-secondary" id="copyHtmlBtn">HTML Kodunu Kopyala</button>
+        <button class="btn-secondary" id="downloadBtn">Fotoğrafı İndir (PNG)</button>
+        <button class="btn-secondary" id="copyHtmlBtn">HTML Kodu</button>
       </div>
       <div class="steps">
         <strong>Nasıl kullanılır?</strong>
         <ol>
-          <li><strong>Gmail:</strong> Ayarlar → Tüm ayarları göster → İmza → Yeni oluştur → kutuya yapıştırın (Ctrl+V / Cmd+V).</li>
-          <li><strong>Outlook:</strong> Ayarlar → Hesaplar → İmzalar → Yeni imza → yapıştırın.</li>
-          <li>Görseller görünmüyorsa "HTML Kodunu Kopyala" ile HTML modunda ekleyin.</li>
+          <li><strong>Outlook:</strong> "İmzayı Kopyala" → Ayarlar → İmzalar → Yeni imza → kutuya yapıştırın (Ctrl+V).</li>
+          <li><strong>Gmail:</strong> "Fotoğrafı İndir" → Gmail Ayarlar → İmza → resim ekle simgesi → <em>Yükle</em> sekmesinden indirdiğiniz PNG'yi seçin.</li>
+          <li>Sosyal medya ikonlarının tıklanabilir olması için "İmzayı Kopyala" yolunu kullanın.</li>
         </ol>
       </div>
     </div>
   </div>
 </div>
 <div class="toast" id="toast">Kopyalandı!</div>
+<canvas id="sigCanvas" width="1313" height="438" style="display:none"></canvas>
 
 <script>
 (function() {
-  // Kopyalanan imzada gorseller mutlak URL ister (mail istemcisi goreli yolu cozemez).
-  // Onizlemede goreli yol kullanilir; kopyalarken BASE ile mutlak yapilir.
-  // BASE otomatik: site hangi adreste yayindaysa gorseller de oradan servis edilir.
-  // Boylece Firebase/Vercel/Netlify farketmeksizin dogru calisir; sadece yerelde
-  // (file://) test edilirken yedek bir mutlak adres kullanilir.
+  // ---- Sabit kurumsal icerik ----
   var BASE = (location.protocol === 'http:' || location.protocol === 'https:')
     ? location.origin + '/'
     : 'https://bonair-mail-imza.web.app/';
-
-  // Sabit kurumsal bilgiler (herkes icin ayni).
-  var COMPANY = 'Bonair Technic';
-  var WEB_TEXT = 'www.bonair.com.tr';
-  var WEB_URL = 'https://www.bonair.com.tr';
-  var ADDRESS = 'Şenlikköy, Orman Sk. No: 10, 34153 Bakırköy/İstanbul';
   var SOCIAL = [
-    { img: 'imza-ig.png',     url: 'https://www.instagram.com/bonairfly/',                                                     alt: 'Instagram' },
-    { img: 'imza-in.png',     url: 'https://www.linkedin.com/company/bonair-havac%C4%B1l%C4%B1k/posts/?feedView=all',          alt: 'LinkedIn' },
-    { img: 'imza-globe.png',  url: 'https://bonair.com.tr/',                                                                   alt: 'Web' },
-    { img: 'imza-pdf.png',    url: 'https://www.bonair.com.tr/wp-content/uploads/2026/01/BONAIR-COMPANY-PRESENTATION-Jan2026-Rev04.pdf', alt: 'Şirket Sunumu' }
+    { img: 'imza-ig.png',    url: 'https://www.instagram.com/bonairfly/', alt: 'Instagram' },
+    { img: 'imza-in.png',    url: 'https://www.linkedin.com/company/bonair-havac%C4%B1l%C4%B1k/posts/?feedView=all', alt: 'LinkedIn' },
+    { img: 'imza-globe.png', url: 'https://bonair.com.tr/', alt: 'Web' },
+    { img: 'imza-pdf.png',   url: 'https://www.bonair.com.tr/wp-content/uploads/2026/01/BONAIR-COMPANY-PRESENTATION-Jan2026-Rev04.pdf', alt: 'Şirket Sunumu' }
   ];
   var DISCLAIMER = 'CONFIDENTIAL: This email is intended solely for the addressee. Unauthorized use is prohibited. If received in error, please notify the sender and delete. BonAir Aviation accepts no liability for errors or viruses.';
+  var WEB_URL = 'https://bonair.com.tr/';
+  var TXT = '#787878';   // sablondaki metin grisi
+  var PHOTO_W = 573;     // Word'deki gosterim genisligi (px)
 
-  // Word taslagi tum metinlerde tek bir orta-gri kullaniyor (#787878).
-  // Bu gri hem beyaz hem koyu mail zemininde okunur -> istemci renk cevirmesine
-  // ihtiyac yok, imza her yerde ayni gorunur.
-  var TXT = '#787878';
-  // Word'deki yuvarlak/geometrik font "Century Gothic" ailesinden. Bu font cogu
-  // Windows/Mac'te kuruludur; oldugu cihazlarda birebir cikar. Olmayan yerlerde
-  // Questrial/Jost (Century Gothic ikizi) ya da Trebuchet/Arial'e duser.
-  // Onizleme sayfasinda Questrial/Jost Google'dan yuklenir.
-  var FONT = "'Century Gothic','Questrial','Jost','Trebuchet MS',Arial,sans-serif";
+  // ---- Sablon uzerine cizim ayarlari (orijinal gorselden kalibre edildi) ----
+  // [alanAdi]: x, taban(y), boyut(px), harfAraligi(px), font, maksGenislik
+  var DRAW = {
+    name:  { x: 4,  by: 207, size: 61.8, ls: 5.1, font: "'GlacialB','JostSemi'", max: 550 },
+    title: { x: 5,  by: 240, size: 21.0, ls: 2.0, font: "'GlacialR','JostReg'",  max: 555 },
+    email: { x: 41, by: 311, size: 20.7, ls: 1.0, font: "'GlacialR','JostReg'",  max: 420 },
+    phone: { x: 41, by: 376, size: 17.9, ls: 1.0, font: "'GlacialR','JostReg'",  max: 420 }
+  };
+
+  var canvas = document.getElementById('sigCanvas');
+  var ctx = canvas.getContext('2d');
+  var template = new Image();
+  template.src = 'imza-sablon.png';
+  var fontsReady = false;
+  var templateReady = false;
 
   function esc(s) {
     return String(s).replace(/[&<>"']/g, function(c) {
@@ -197,58 +166,52 @@
     });
   }
 
-  function contactRow(iconUrl, alt, text, href) {
-    var inner = href
-      ? '<a href="' + esc(href) + '" style="color:' + TXT + ';text-decoration:none;">' + esc(text) + '</a>'
-      : esc(text);
-    return '' +
-      '<tr>' +
-        '<td style="padding:3px 9px 3px 0;vertical-align:middle;">' +
-          '<img src="' + iconUrl + '" alt="' + alt + '" width="16" height="16" style="display:block;width:16px;height:16px;border:0;">' +
-        '</td>' +
-        '<td style="vertical-align:middle;font-family:' + FONT + ';font-size:14px;color:' + TXT + ';line-height:1.5;">' + inner + '</td>' +
-      '</tr>';
+  // Fotografi ciz: sablon + kisisel metinler
+  function drawPhoto(v) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(template, 0, 0);
+    ctx.fillStyle = TXT;
+    ctx.textBaseline = 'alphabetic';
+    Object.keys(DRAW).forEach(function(key) {
+      var d = DRAW[key];
+      var text = v[key];
+      if (!text) return;
+      var size = d.size;
+      // uzun metin sigmazsa oranli kucult
+      for (var i = 0; i < 8; i++) {
+        if (ctx.letterSpacing !== undefined) ctx.letterSpacing = (d.ls * size / d.size).toFixed(2) + 'px';
+        ctx.font = size.toFixed(2) + 'px ' + d.font;
+        var w = ctx.measureText(text).width;
+        if (w <= d.max) break;
+        size *= d.max / w;
+      }
+      ctx.fillText(text, d.x, d.by);
+    });
+    if (ctx.letterSpacing !== undefined) ctx.letterSpacing = '0px';
+    return canvas.toDataURL('image/png');
   }
 
-  // E-posta istemcileri icin guvenli: tablo tabanli, tum stiller inline.
-  function buildSignature(v, base) {
-    base = base || '';
-    var telHref = 'tel:' + String(v.phone).replace(/[^+\d]/g, '');
-    var socialCells = SOCIAL.map(function(s) {
+  // Imza HTML'i: [fotograf | sosyal ikon sutunu] + gizlilik satiri
+  function buildSignature(photoSrc, iconBase) {
+    var icons = SOCIAL.map(function(s) {
       return '<a href="' + s.url + '" target="_blank" style="text-decoration:none;">' +
-             '<img src="' + base + s.img + '" alt="' + s.alt + '" width="22" height="22" style="display:block;width:22px;height:22px;border:0;margin:0 0 10px 0;">' +
+             '<img src="' + iconBase + s.img + '" alt="' + s.alt + '" width="22" height="22" style="display:block;width:22px;height:22px;border:0;margin:0 0 9px 0;">' +
              '</a>';
     }).join('');
-
     return '' +
-    '<table cellpadding="0" cellspacing="0" border="0" width="742" style="width:742px;font-family:' + FONT + ';border-collapse:collapse;table-layout:fixed;">' +
+    '<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">' +
       '<tr>' +
-        // SOL: logo + isim + unvan + iletisim
-        '<td width="374" style="width:374px;vertical-align:top;padding:0 20px 0 0;">' +
-          '<img src="' + base + 'bonair-logo-email.png" alt="' + COMPANY + '" width="140" style="display:block;width:140px;height:auto;border:0;margin-bottom:14px;">' +
-          '<div style="font-family:' + FONT + ';font-size:31px;font-weight:bold;color:' + TXT + ';line-height:1.05;letter-spacing:.5px;">' + esc(v.name) + '</div>' +
-          '<div style="font-family:' + FONT + ';font-size:15px;color:' + TXT + ';padding:4px 0 16px 0;">' + esc(v.title) + '</div>' +
-          '<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">' +
-            contactRow(base + 'imza-ic-mail.png', 'E-posta', v.email, 'mailto:' + v.email) +
-            contactRow(base + 'imza-ic-web.png', 'Web', WEB_TEXT, WEB_URL) +
-            contactRow(base + 'imza-ic-phone.png', 'Telefon', v.phone, telHref) +
-          '</table>' +
+        '<td style="vertical-align:top;padding:0 14px 0 0;">' +
+          '<img src="' + photoSrc + '" alt="Bonair" width="' + PHOTO_W + '" style="display:block;width:' + PHOTO_W + 'px;height:auto;border:0;">' +
         '</td>' +
-        // ORTA: bina illustrasyonu
-        '<td width="334" style="width:334px;vertical-align:bottom;padding:0 6px 0 0;">' +
-          '<img src="' + base + 'imza-building.png" alt="Bonair" width="328" style="display:block;width:328px;height:auto;border:0;">' +
-        '</td>' +
-        // SAG: sosyal / link ikonlari (dikey)
-        '<td width="34" style="width:34px;vertical-align:top;padding:2px 0 0 6px;">' + socialCells + '</td>' +
+        '<td style="vertical-align:top;padding-top:2px;width:24px;">' + icons + '</td>' +
       '</tr>' +
       '<tr>' +
-        '<td colspan="3" style="padding:10px 0 0 0;font-family:' + FONT + ';font-size:13px;color:' + TXT + ';">' + esc(ADDRESS) + '</td>' +
+        '<td colspan="2" style="padding:10px 0 0 0;font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#8A8F94;line-height:1.5;">' +
+          esc(DISCLAIMER) + ' | <a href="' + WEB_URL + '" style="color:#8A8F94;">bonair.com.tr</a>' +
+        '</td>' +
       '</tr>' +
-    '</table>' +
-    '<div style="max-width:680px;font-family:' + FONT + ';font-size:11px;color:' + TXT + ';line-height:1.5;margin-top:10px;">' +
-      esc(DISCLAIMER) + ' | ' +
-      '<a href="' + WEB_URL + '" style="color:' + TXT + ';text-decoration:none;">bonair.com.tr</a>' +
-    '</div>';
+    '</table>';
   }
 
   var nameEl = document.getElementById('fullName');
@@ -257,13 +220,16 @@
   var phoneEl = document.getElementById('phone');
   var previewWrap = document.getElementById('previewWrap');
   var copyBtn = document.getElementById('copyBtn');
+  var downloadBtn = document.getElementById('downloadBtn');
   var copyHtmlBtn = document.getElementById('copyHtmlBtn');
   var toast = document.getElementById('toast');
   var toastTimer = null;
+  var previewMode = 'light';
+  var currentPhoto = '';
 
   function values() {
     return {
-      name: nameEl.value.trim() || 'Ad Soyad',
+      name: nameEl.value.trim() || 'Ad SOYAD',
       title: titleEl.value.trim() || 'Unvan',
       email: emailEl.value.trim() || 'ornek@bonair.com.tr',
       phone: phoneEl.value.trim() || '+90 5xx xxx xx xx'
@@ -276,93 +242,90 @@
     return nameEl.value.trim() !== '' && titleEl.value.trim() !== '' && emailOk && phoneEl.value.trim() !== '';
   }
 
-  var previewMode = 'dark';  // senin mailin koyu; varsayilan koyu onizleme
-
   function render() {
-    previewWrap.innerHTML = buildSignature(values(), '');
+    if (!fontsReady || !templateReady) return;
+    currentPhoto = drawPhoto(values());
+    previewWrap.innerHTML = buildSignature(currentPhoto, '');
     previewWrap.classList.toggle('preview-dark', previewMode === 'dark');
     previewWrap.classList.toggle('preview-light', previewMode === 'light');
     var ready = isReady();
     copyBtn.disabled = !ready;
+    downloadBtn.disabled = !ready;
     copyHtmlBtn.disabled = !ready;
+  }
+
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function() { toast.classList.remove('show'); }, 2600);
   }
 
   document.getElementById('modeToggle').addEventListener('click', function(e) {
     var btn = e.target.closest('button');
     if (!btn) return;
     previewMode = btn.getAttribute('data-mode');
-    this.querySelectorAll('button').forEach(function(b) {
-      b.classList.toggle('active', b === btn);
-    });
+    this.querySelectorAll('button').forEach(function(b) { b.classList.toggle('active', b === btn); });
     render();
   });
 
-  function showToast(msg) {
-    toast.textContent = msg;
-    toast.classList.add('show');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(function() { toast.classList.remove('show'); }, 2400);
-  }
-
-  function currentHtml() {
-    return buildSignature(values(), BASE);
-  }
-
   copyBtn.addEventListener('click', function() {
-    var html = currentHtml();
+    var html = buildSignature(currentPhoto, BASE);
     var v = values();
-    var plain = v.name + '\n' + v.title + '\n' + COMPANY +
-                '\nE-posta: ' + v.email + '\nWeb: ' + WEB_TEXT + '\nTelefon: ' + v.phone +
-                '\n' + ADDRESS;
-    if (navigator.clipboard && window.ClipboardItem) {
-      navigator.clipboard.write([new ClipboardItem({
-        'text/html': new Blob([html], { type: 'text/html' }),
-        'text/plain': new Blob([plain], { type: 'text/plain' })
-      })]).then(function() {
-        showToast('İmza kopyalandı! Mail ayarlarınıza yapıştırabilirsiniz.');
-      }).catch(fallbackCopy);
-    } else {
-      fallbackCopy();
-    }
-    // Eski tarayicilar: mutlak URL'li imzayi gizli bir kutuya basip secip kopyala.
+    var plain = v.name + '\n' + v.title + '\nE-posta: ' + v.email + '\nTelefon: ' + v.phone;
     function fallbackCopy() {
       var holder = document.createElement('div');
-      holder.style.cssText = 'position:fixed;left:-9999px;top:0;';
+      holder.style.cssText = 'position:fixed;left:-9999px;top:0;background:#fff;';
       holder.innerHTML = html;
       document.body.appendChild(holder);
       var range = document.createRange();
       range.selectNodeContents(holder);
       var sel = window.getSelection();
-      sel.removeAllRanges();
-      sel.addRange(range);
+      sel.removeAllRanges(); sel.addRange(range);
       var ok = false;
-      try { ok = document.execCommand('copy'); } catch (e) {}
+      try { ok = document.execCommand('copy'); } catch (err) {}
       sel.removeAllRanges();
       document.body.removeChild(holder);
-      showToast(ok ? 'İmza kopyalandı!' : 'Kopyalanamadı, HTML kodunu kullanın.');
+      showToast(ok ? 'İmza kopyalandı! Mail ayarlarına yapıştırın.' : 'Kopyalanamadı — Fotoğrafı İndir yolunu deneyin.');
     }
+    if (navigator.clipboard && window.ClipboardItem) {
+      navigator.clipboard.write([new ClipboardItem({
+        'text/html': new Blob([html], { type: 'text/html' }),
+        'text/plain': new Blob([plain], { type: 'text/plain' })
+      })]).then(function() {
+        showToast('İmza kopyalandı! Outlook imza ayarlarına yapıştırın.');
+      }).catch(fallbackCopy);
+    } else { fallbackCopy(); }
+  });
+
+  downloadBtn.addEventListener('click', function() {
+    var v = values();
+    var a = document.createElement('a');
+    a.href = currentPhoto;
+    a.download = 'bonair-imza-' + v.name.toLowerCase().replace(/[^a-z0-9]+/gi, '-') + '.png';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    showToast('Fotoğraf indirildi. Gmail: İmza → resim ekle → Yükle.');
   });
 
   copyHtmlBtn.addEventListener('click', function() {
-    var html = currentHtml();
+    var html = buildSignature(currentPhoto, BASE);
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(html).then(function() {
-        showToast('HTML kodu kopyalandı!');
-      });
-    } else {
-      var ta = document.createElement('textarea');
-      ta.value = html;
-      document.body.appendChild(ta);
-      ta.select();
-      try { document.execCommand('copy'); showToast('HTML kodu kopyalandı!'); } catch (e) {}
-      document.body.removeChild(ta);
+      navigator.clipboard.writeText(html).then(function() { showToast('HTML kodu kopyalandı!'); });
     }
   });
 
-  [nameEl, titleEl, emailEl, phoneEl].forEach(function(el) {
-    el.addEventListener('input', render);
-  });
-  render();
+  [nameEl, titleEl, emailEl, phoneEl].forEach(function(el) { el.addEventListener('input', render); });
+
+  // Fontlar + sablon hazir olunca ilk cizim
+  template.onload = function() { templateReady = true; render(); };
+  if (template.complete) { templateReady = true; }
+  Promise.all([
+    document.fonts.load("62px 'GlacialB'"),
+    document.fonts.load("21px 'GlacialR'"),
+    document.fonts.load("62px 'JostSemi'"),
+    document.fonts.load("21px 'JostReg'")
+  ]).then(function() { fontsReady = true; render(); })
+    .catch(function() { fontsReady = true; render(); });
 })();
 </script>
 </body>
