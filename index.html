@@ -8,7 +8,7 @@
 <link rel="shortcut icon" href="favicon.ico">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Questrial&family=Jost:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -181,14 +181,15 @@
   ];
   var DISCLAIMER = 'CONFIDENTIAL: This email is intended solely for the addressee. Unauthorized use is prohibited. If received in error, please notify the sender and delete. BonAir Aviation accepts no liability for errors or viruses.';
 
-  var NAME_COLOR = '#20242B';
-  var GRAY = '#6B7075';
-  var LIGHT_GRAY = '#8A8F94';
-  var LINK = '#6B7075';
-  // Taslaktaki yuvarlak/geometrik fonta en yakin, mail istemcilerinde de
-  // buyuk olasilikla kurulu olan font zinciri (Century Gothic -> Trebuchet -> Arial).
-  // Onizleme sayfasinda ayrica Google'dan Poppins yuklenir, birebir gorunur.
-  var FONT = "'Century Gothic','Poppins','Trebuchet MS',Arial,Helvetica,sans-serif";
+  // Word taslagi tum metinlerde tek bir orta-gri kullaniyor (#787878).
+  // Bu gri hem beyaz hem koyu mail zemininde okunur -> istemci renk cevirmesine
+  // ihtiyac yok, imza her yerde ayni gorunur.
+  var TXT = '#787878';
+  // Word'deki yuvarlak/geometrik font "Century Gothic" ailesinden. Bu font cogu
+  // Windows/Mac'te kuruludur; oldugu cihazlarda birebir cikar. Olmayan yerlerde
+  // Questrial/Jost (Century Gothic ikizi) ya da Trebuchet/Arial'e duser.
+  // Onizleme sayfasinda Questrial/Jost Google'dan yuklenir.
+  var FONT = "'Century Gothic','Questrial','Jost','Trebuchet MS',Arial,sans-serif";
 
   function esc(s) {
     return String(s).replace(/[&<>"']/g, function(c) {
@@ -196,32 +197,22 @@
     });
   }
 
-  // Onizlemede koyu/acik arka plana gore metin renkleri. Kopyalanan imza her
-  // zaman acik-mod (koyu metin) uretilir; koyu-mod mail istemcileri metni
-  // otomatik acik renge cevirir.
-  function palette(dark) {
-    return dark
-      ? { name: '#F2F3F5', gray: '#C7CCD2', light: '#AEB4BB', link: '#C7CCD2' }
-      : { name: NAME_COLOR, gray: GRAY, light: LIGHT_GRAY, link: LINK };
-  }
-
-  function contactRow(iconUrl, alt, text, href, pal) {
+  function contactRow(iconUrl, alt, text, href) {
     var inner = href
-      ? '<a href="' + esc(href) + '" style="color:' + pal.link + ';text-decoration:none;">' + esc(text) + '</a>'
+      ? '<a href="' + esc(href) + '" style="color:' + TXT + ';text-decoration:none;">' + esc(text) + '</a>'
       : esc(text);
     return '' +
       '<tr>' +
-        '<td style="padding:2px 8px 2px 0;vertical-align:middle;">' +
+        '<td style="padding:3px 9px 3px 0;vertical-align:middle;">' +
           '<img src="' + iconUrl + '" alt="' + alt + '" width="16" height="16" style="display:block;width:16px;height:16px;border:0;">' +
         '</td>' +
-        '<td style="vertical-align:middle;font-size:13px;color:' + pal.gray + ';line-height:1.4;">' + inner + '</td>' +
+        '<td style="vertical-align:middle;font-family:' + FONT + ';font-size:14px;color:' + TXT + ';line-height:1.5;">' + inner + '</td>' +
       '</tr>';
   }
 
   // E-posta istemcileri icin guvenli: tablo tabanli, tum stiller inline.
-  function buildSignature(v, base, dark) {
+  function buildSignature(v, base) {
     base = base || '';
-    var pal = palette(dark);
     var telHref = 'tel:' + String(v.phone).replace(/[^+\d]/g, '');
     var socialCells = SOCIAL.map(function(s) {
       return '<a href="' + s.url + '" target="_blank" style="text-decoration:none;">' +
@@ -230,33 +221,33 @@
     }).join('');
 
     return '' +
-    '<table cellpadding="0" cellspacing="0" border="0" width="716" style="width:716px;font-family:' + FONT + ';border-collapse:collapse;table-layout:fixed;">' +
+    '<table cellpadding="0" cellspacing="0" border="0" width="742" style="width:742px;font-family:' + FONT + ';border-collapse:collapse;table-layout:fixed;">' +
       '<tr>' +
         // SOL: logo + isim + unvan + iletisim
-        '<td width="356" style="width:356px;vertical-align:top;padding:0 20px 0 0;">' +
-          '<img src="' + base + 'bonair-logo-email.png" alt="' + COMPANY + '" width="132" style="display:block;width:132px;height:auto;border:0;margin-bottom:14px;">' +
-          '<div style="font-family:' + FONT + ';font-size:27px;font-weight:bold;color:' + pal.name + ';line-height:1.05;letter-spacing:.3px;">' + esc(v.name) + '</div>' +
-          '<div style="font-family:' + FONT + ';font-size:13px;color:' + pal.gray + ';padding:4px 0 14px 0;">' + esc(v.title) + '</div>' +
+        '<td width="374" style="width:374px;vertical-align:top;padding:0 20px 0 0;">' +
+          '<img src="' + base + 'bonair-logo-email.png" alt="' + COMPANY + '" width="140" style="display:block;width:140px;height:auto;border:0;margin-bottom:14px;">' +
+          '<div style="font-family:' + FONT + ';font-size:31px;font-weight:bold;color:' + TXT + ';line-height:1.05;letter-spacing:.5px;">' + esc(v.name) + '</div>' +
+          '<div style="font-family:' + FONT + ';font-size:15px;color:' + TXT + ';padding:4px 0 16px 0;">' + esc(v.title) + '</div>' +
           '<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">' +
-            contactRow(base + 'imza-ic-mail.png', 'E-posta', v.email, 'mailto:' + v.email, pal) +
-            contactRow(base + 'imza-ic-web.png', 'Web', WEB_TEXT, WEB_URL, pal) +
-            contactRow(base + 'imza-ic-phone.png', 'Telefon', v.phone, telHref, pal) +
+            contactRow(base + 'imza-ic-mail.png', 'E-posta', v.email, 'mailto:' + v.email) +
+            contactRow(base + 'imza-ic-web.png', 'Web', WEB_TEXT, WEB_URL) +
+            contactRow(base + 'imza-ic-phone.png', 'Telefon', v.phone, telHref) +
           '</table>' +
         '</td>' +
         // ORTA: bina illustrasyonu
-        '<td width="326" style="width:326px;vertical-align:bottom;padding:0 6px 0 0;">' +
-          '<img src="' + base + 'imza-building.png" alt="Bonair" width="320" style="display:block;width:320px;height:auto;border:0;">' +
+        '<td width="334" style="width:334px;vertical-align:bottom;padding:0 6px 0 0;">' +
+          '<img src="' + base + 'imza-building.png" alt="Bonair" width="328" style="display:block;width:328px;height:auto;border:0;">' +
         '</td>' +
         // SAG: sosyal / link ikonlari (dikey)
         '<td width="34" style="width:34px;vertical-align:top;padding:2px 0 0 6px;">' + socialCells + '</td>' +
       '</tr>' +
       '<tr>' +
-        '<td colspan="3" style="padding:8px 0 0 0;font-family:' + FONT + ';font-size:12px;color:' + pal.light + ';">' + esc(ADDRESS) + '</td>' +
+        '<td colspan="3" style="padding:10px 0 0 0;font-family:' + FONT + ';font-size:13px;color:' + TXT + ';">' + esc(ADDRESS) + '</td>' +
       '</tr>' +
     '</table>' +
-    '<div style="max-width:660px;font-family:' + FONT + ';font-size:11px;color:' + pal.light + ';line-height:1.5;margin-top:10px;">' +
+    '<div style="max-width:680px;font-family:' + FONT + ';font-size:11px;color:' + TXT + ';line-height:1.5;margin-top:10px;">' +
       esc(DISCLAIMER) + ' | ' +
-      '<a href="' + WEB_URL + '" style="color:' + pal.link + ';text-decoration:none;">bonair.com.tr</a>' +
+      '<a href="' + WEB_URL + '" style="color:' + TXT + ';text-decoration:none;">bonair.com.tr</a>' +
     '</div>';
   }
 
@@ -288,7 +279,7 @@
   var previewMode = 'dark';  // senin mailin koyu; varsayilan koyu onizleme
 
   function render() {
-    previewWrap.innerHTML = buildSignature(values(), '', previewMode === 'dark');
+    previewWrap.innerHTML = buildSignature(values(), '');
     previewWrap.classList.toggle('preview-dark', previewMode === 'dark');
     previewWrap.classList.toggle('preview-light', previewMode === 'light');
     var ready = isReady();
