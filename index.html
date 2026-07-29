@@ -195,6 +195,7 @@
   var DISCLAIMER_TR = 'UYARI: Bu elektronik posta ve ekleri, yalnızca gönderilmek istenen kişi/kişilere özel ve gizlidir. Mesajın yanlışlıkla tarafınıza ulaşması hâlinde lütfen göndericiyi bilgilendirip mesajı siliniz. Göndericinin bilgisi ve izni dışında bu mesajın üçüncü kişilere yönlendirilmesi, kopyalanması veya kullanılması yasaktır. Bonair Havacılık Tic. ve San. A.Ş. ve iştirakleri; bu elektronik postanın ve içeriğindeki bilgilerin doğruluğundan, güncelliğinden ve bağlayıcılığından, üçüncü kişilere ait kişisel veri içermesi hâlinde bundan doğabilecek sonuçlardan ve/veya bu elektronik postanın bilgisayar sisteminize verebileceği zararlardan sorumlu tutulamaz.';
   var DISCLAIMER_EN = 'DISCLAIMER: This email and its attachments are confidential and intended solely for the named recipient(s). If you have received this message in error, please notify the sender and delete it. Forwarding, copying or using any part of this message without the sender\'s knowledge and consent is strictly prohibited. Bonair Havacılık Tic. ve San. A.Ş. and its subsidiaries accept no liability for the accuracy, currency or binding nature of this email or its contents, for any third-party personal data it may contain, or for any damage this email may cause to your computer system.';
   var WEB_URL = 'https://bonair.com.tr/';
+  var WEB_TEXT = 'www.bonair.com.tr';   // imzada goruntulenen web adresi (sabit)
   var TXT = '#787878';   // sablondaki metin grisi
   var PHOTO_W = 573;     // Word'deki gosterim genisligi (px)
 
@@ -203,8 +204,11 @@
   var DRAW = {
     name:  { x: 4,  by: 207, size: 60.0, ls: 0, font: "'MontB'", max: 550 },
     title: { x: 5,  by: 240, size: 20.8, ls: 0, font: "'MontR'", max: 460 },
-    email: { x: 47, by: 311, size: 18.3, ls: 0, font: "'MontR'", max: 420 },
-    phone: { x: 47, by: 376, size: 18.3, ls: 0, font: "'MontR'", max: 420 }
+    // Iletisim satirlari: ust=telefon, orta=e-posta, alt=web. Ucu de ayni x'ten
+    // baslar (ikon mürekkebi x=30'da biter, metin x=39'dan baslar).
+    phone: { x: 39, by: 310.0, size: 18.3, ls: 0, font: "'MontR'", max: 420 },
+    email: { x: 39, by: 342.5, size: 18.3, ls: 0, font: "'MontR'", max: 420 },
+    web:   { x: 39, by: 376.5, size: 18.3, ls: 0, font: "'MontR'", max: 420 }
   };
 
   var canvas = document.getElementById('sigCanvas');
@@ -362,6 +366,7 @@
     return {
       name: ((nameCase(firstEl.value.trim()) || 'Talha') + ' ' + (trUpper(lastEl.value.trim()) || 'DUYGU')).trim(),
       title: titleEl.value.trim() || 'Technical Quality & SMS Engineer',
+      web: WEB_TEXT,
       email: (emailEl.value.trim() || 'tduygu') + '@bonair.com.tr',
       phone: (function() {
         var d = phoneEl.value.replace(/\D/g, '');
