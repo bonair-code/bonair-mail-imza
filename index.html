@@ -119,8 +119,6 @@
       <div class="preview-wrap preview-light" id="previewWrap"></div>
       <div class="btn-row">
         <button class="btn-primary" id="copyBtn">İmzayı Kopyala</button>
-        <button class="btn-secondary" id="downloadBtn">Fotoğrafı İndir (PNG)</button>
-        <button class="btn-secondary" id="copyHtmlBtn">HTML Kodu</button>
       </div>
       <div class="steps">
         <strong>Nasıl kullanılır?</strong>
@@ -262,8 +260,6 @@
   var phoneEl = document.getElementById('phone');
   var previewWrap = document.getElementById('previewWrap');
   var copyBtn = document.getElementById('copyBtn');
-  var downloadBtn = document.getElementById('downloadBtn');
-  var copyHtmlBtn = document.getElementById('copyHtmlBtn');
   var toast = document.getElementById('toast');
   var toastTimer = null;
   var previewMode = 'light';
@@ -292,8 +288,6 @@
     previewWrap.classList.toggle('preview-light', previewMode === 'light');
     var ready = isReady();
     copyBtn.disabled = !ready;
-    downloadBtn.disabled = !ready;
-    copyHtmlBtn.disabled = !ready;
   }
 
   function showToast(msg) {
@@ -338,22 +332,6 @@
         showToast('İmza kopyalandı! Outlook imza ayarlarına yapıştırın.');
       }).catch(fallbackCopy);
     } else { fallbackCopy(); }
-  });
-
-  downloadBtn.addEventListener('click', function() {
-    var v = values();
-    var a = document.createElement('a');
-    a.href = currentPhoto;
-    a.download = 'bonair-imza-' + v.name.toLowerCase().replace(/[^a-z0-9]+/gi, '-') + '.png';
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    showToast('Fotoğraf indirildi. Gmail: İmza → resim ekle → Yükle.');
-  });
-
-  copyHtmlBtn.addEventListener('click', function() {
-    var html = buildSignature(currentPhoto, BASE);
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(html).then(function() { showToast('HTML kodu kopyalandı!'); });
-    }
   });
 
   [nameEl, titleEl, emailEl, phoneEl].forEach(function(el) { el.addEventListener('input', render); });
