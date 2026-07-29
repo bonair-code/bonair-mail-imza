@@ -88,6 +88,31 @@
   .steps strong { color: #B9C8DD; }
   .steps ol { padding-left: 18px; margin-top: 6px; }
   .steps ol li { margin-bottom: 4px; }
+
+  /* --- Mobil (telefon) --- */
+  @media (max-width: 640px) {
+    body { padding: 18px 12px; }
+    .header h1 { font-size: 20px; }
+    .header p { font-size: 13px; }
+    .grid { gap: 16px; }
+    .card { padding: 16px; border-radius: 12px; }
+    /* iOS'ta 16px alti input odaklaninca sayfayi yakinlastiriyor */
+    .form-group input, .phone-row select { font-size: 16px; }
+    .form-group { margin-bottom: 14px; }
+    .email-suffix { font-size: 13px; padding: 0 8px; }
+    .phone-row select { width: 104px; font-size: 14px; padding-left: 4px; padding-right: 2px; }
+    .preview-wrap { padding: 12px; }
+    /* Fotograf ekrana sigdiruldigu icin ikonlar ve gizlilik metni de oransal
+       kucultulur. Sadece ONIZLEME etkilenir; kopyalanan imza sabit olculerde kalir. */
+    #previewWrap table table img { width: 12px !important; height: 12px !important; }
+    #previewWrap table table td { height: 20px !important; }
+    #previewWrap span { font-size: 9px !important; line-height: 1.45 !important; }
+    .preview-head { flex-wrap: wrap; gap: 10px; }
+    .btn-primary { min-width: 0; width: 100%; }
+    .guide { padding: 10px; }
+    .steps, .steps ol { font-size: 12.5px; }
+    .steps ol { padding-left: 16px; }
+  }
   .guide { background: #0A1628; border: 1px solid #1E3355; border-radius: 9px; padding: 10px 14px; margin-top: 10px; }
   .guide summary { cursor: pointer; font-weight: 700; color: #B9C8DD; font-size: 13px; }
   .guide summary:hover { color: #E8EDF4; }
@@ -256,7 +281,9 @@
   //  - fotografta width VE height attribute birlikte -> Outlook yeniden olcekleyemez
   //  - gizlilik metni <font size="1"> ile (inline font-size ezilse bile kucuk kalir)
   var PHOTO_H = Math.round(438 / 1313 * 573);  // 191
-  function buildSignature(photoSrc, iconBase) {
+  // responsive=true SADECE sayfadaki onizleme icindir (mobilde ekrana sigsin).
+  // Kopyalanan imza her zaman sabit px olcularle uretilir — Outlook oyle istiyor.
+  function buildSignature(photoSrc, iconBase, responsive) {
     var iconRows = SOCIAL.map(function(s, i) {
       var last = (i === SOCIAL.length - 1);
       return '<tr><td height="' + (last ? 24 : 40) + '" width="24" align="center" valign="' + (last ? 'middle' : 'top') + '" style="height:' + (last ? 24 : 40) + 'px;text-align:center;">' +
@@ -264,12 +291,21 @@
              '<img src="' + iconBase + s.img + '" alt="' + s.alt + '" width="22" height="22" border="0" style="display:inline-block;width:22px;height:22px;border:0;">' +
              '</a></td></tr>';
     }).join('');
-    return '' +
-    '<table cellpadding="0" cellspacing="0" border="0" width="' + (PHOTO_W + 14 + 24) + '" style="border-collapse:collapse;width:' + (PHOTO_W + 14 + 24) + 'px;">' +
-      '<tr>' +
-        '<td width="' + PHOTO_W + '" valign="top" style="width:' + PHOTO_W + 'px;vertical-align:top;">' +
+    var TOTAL_W = PHOTO_W + 14 + 24;
+    var tableAttrs = responsive
+      ? 'style="border-collapse:collapse;width:100%;max-width:' + TOTAL_W + 'px;"'
+      : 'width="' + TOTAL_W + '" style="border-collapse:collapse;width:' + TOTAL_W + 'px;"';
+    var photoCell = responsive
+      ? '<td valign="top" style="vertical-align:top;">' +
+          '<img src="' + photoSrc + '" alt="Bonair" style="display:block;width:100%;height:auto;border:0;">' +
+        '</td>'
+      : '<td width="' + PHOTO_W + '" valign="top" style="width:' + PHOTO_W + 'px;vertical-align:top;">' +
           '<img src="' + photoSrc + '" alt="Bonair" width="' + PHOTO_W + '" height="' + PHOTO_H + '" border="0" style="display:block;width:' + PHOTO_W + 'px;height:' + PHOTO_H + 'px;border:0;">' +
-        '</td>' +
+        '</td>';
+    return '' +
+    '<table cellpadding="0" cellspacing="0" border="0" ' + tableAttrs + '>' +
+      '<tr>' +
+        photoCell +
         '<td width="14" style="width:14px;font-size:1px;line-height:1px;">&nbsp;</td>' +
         '<td width="24" valign="middle" style="width:24px;vertical-align:middle;">' +
           '<table cellpadding="0" cellspacing="0" border="0" width="24" style="border-collapse:collapse;">' + iconRows + '</table>' +
@@ -387,7 +423,7 @@
   function render() {
     if (!fontsReady || !templateReady) return;
     currentPhoto = drawPhoto(values());
-    previewWrap.innerHTML = buildSignature(currentPhoto, '');
+    previewWrap.innerHTML = buildSignature(currentPhoto, '', true);
     previewWrap.classList.toggle('preview-dark', previewMode === 'dark');
     previewWrap.classList.toggle('preview-light', previewMode === 'light');
     var ready = isReady();
