@@ -43,6 +43,14 @@
     font-size: 14px; font-family: inherit; outline: none; transition: border-color .15s;
   }
   .form-group input:focus { border-color: #4A90D9; }
+  .phone-row { display: flex; gap: 8px; }
+  .phone-row select {
+    width: 118px; flex: none; padding: 11px 6px; border-radius: 9px;
+    border: 1px solid #2A4166; background: #0A1628; color: #E8EDF4;
+    font-size: 13px; font-family: inherit; outline: none;
+  }
+  .phone-row select:focus { border-color: #4A90D9; }
+  .phone-row input { flex: 1; min-width: 0; }
   .form-group input.invalid { border-color: #D95757; }
   .hint { font-size: 12px; color: #5F7494; margin-top: 5px; }
   .preview-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
@@ -104,7 +112,11 @@
       </div>
       <div class="form-group">
         <label for="phone">Telefon</label>
-        <input id="phone" type="tel" placeholder="+90 546 269 23 09" autocomplete="tel" maxlength="25">
+        <div class="phone-row">
+          <select id="dialCode" aria-label="Ülke kodu"></select>
+          <input id="phone" type="tel" placeholder="546 269 23 09" autocomplete="tel" maxlength="18">
+        </div>
+        <div class="hint">Başında 0 olmadan yazın; numara otomatik biçimlenir.</div>
       </div>
     </div>
 
@@ -255,6 +267,62 @@
     '</table>';
   }
 
+  // Ulke kodlari (Turkiye ustte, gerisi alfabetik)
+  var COUNTRIES = [
+    ["Türkiye","+90"],["ABD / Kanada","+1"],["Afganistan","+93"],["Almanya","+49"],["Andorra","+376"],
+    ["Angola","+244"],["Arjantin","+54"],["Arnavutluk","+355"],["Avustralya","+61"],["Avusturya","+43"],
+    ["Azerbaycan","+994"],["Bahamalar","+1242"],["Bahreyn","+973"],["Bangladeş","+880"],["Barbados","+1246"],
+    ["Belarus","+375"],["Belçika","+32"],["Belize","+501"],["Benin","+229"],["Bhutan","+975"],
+    ["BAE","+971"],["Bolivya","+591"],["Bosna-Hersek","+387"],["Botsvana","+267"],["Brezilya","+55"],
+    ["Brunei","+673"],["Bulgaristan","+359"],["Burkina Faso","+226"],["Burundi","+257"],["Cezayir","+213"],
+    ["Cibuti","+253"],["Çad","+235"],["Çekya","+420"],["Çin","+86"],["Danimarka","+45"],
+    ["Dominik Cum.","+1809"],["Ekvador","+593"],["Ekvator Ginesi","+240"],["El Salvador","+503"],["Endonezya","+62"],
+    ["Eritre","+291"],["Ermenistan","+374"],["Estonya","+372"],["Esvatini","+268"],["Etiyopya","+251"],
+    ["Fas","+212"],["Fiji","+679"],["Fildişi Sahili","+225"],["Filipinler","+63"],["Filistin","+970"],
+    ["Finlandiya","+358"],["Fransa","+33"],["Gabon","+241"],["Gambiya","+220"],["Gana","+233"],
+    ["Gine","+224"],["Gine-Bissau","+245"],["Grenada","+1473"],["Guatemala","+502"],["Guyana","+592"],
+    ["Güney Afrika","+27"],["Güney Kore","+82"],["Güney Sudan","+211"],["Gürcistan","+995"],["Haiti","+509"],
+    ["Hindistan","+91"],["Hırvatistan","+385"],["Hollanda","+31"],["Honduras","+504"],["Irak","+964"],
+    ["İran","+98"],["İrlanda","+353"],["İspanya","+34"],["İsrail","+972"],["İsveç","+46"],
+    ["İsviçre","+41"],["İtalya","+39"],["İzlanda","+354"],["Jamaika","+1876"],["Japonya","+81"],
+    ["Kamboçya","+855"],["Kamerun","+237"],["Karadağ","+382"],["Katar","+974"],["Kazakistan","+7"],
+    ["Kenya","+254"],["Kıbrıs (KKTC)","+90392"],["Kıbrıs (Rum)","+357"],["Kırgızistan","+996"],["Kiribati","+686"],
+    ["Kolombiya","+57"],["Komorlar","+269"],["Kongo","+242"],["Kongo DC","+243"],["Kosova","+383"],
+    ["Kosta Rika","+506"],["Kuveyt","+965"],["Küba","+53"],["Laos","+856"],["Lesotho","+266"],
+    ["Letonya","+371"],["Liberya","+231"],["Libya","+218"],["Lihtenştayn","+423"],["Litvanya","+370"],
+    ["Lübnan","+961"],["Lüksemburg","+352"],["Macaristan","+36"],["Madagaskar","+261"],["Makedonya","+389"],
+    ["Malavi","+265"],["Maldivler","+960"],["Malezya","+60"],["Mali","+223"],["Malta","+356"],
+    ["Meksika","+52"],["Mısır","+20"],["Moğolistan","+976"],["Moldova","+373"],["Monako","+377"],
+    ["Moritanya","+222"],["Mauritius","+230"],["Mozambik","+258"],["Myanmar","+95"],["Namibya","+264"],
+    ["Nepal","+977"],["Nijer","+227"],["Nijerya","+234"],["Nikaragua","+505"],["Norveç","+47"],
+    ["Orta Afrika Cum.","+236"],["Özbekistan","+998"],["Pakistan","+92"],["Panama","+507"],["Papua Yeni Gine","+675"],
+    ["Paraguay","+595"],["Peru","+51"],["Polonya","+48"],["Portekiz","+351"],["Romanya","+40"],
+    ["Ruanda","+250"],["Rusya","+7"],["Samoa","+685"],["San Marino","+378"],["Senegal","+221"],
+    ["Seyşeller","+248"],["Sırbistan","+381"],["Sierra Leone","+232"],["Singapur","+65"],["Slovakya","+421"],
+    ["Slovenya","+386"],["Somali","+252"],["Sri Lanka","+94"],["Sudan","+249"],["Surinam","+597"],
+    ["Suriye","+963"],["Suudi Arabistan","+966"],["Şili","+56"],["Tacikistan","+992"],["Tanzanya","+255"],
+    ["Tayland","+66"],["Tayvan","+886"],["Togo","+228"],["Tonga","+676"],["Trinidad ve Tobago","+1868"],
+    ["Tunus","+216"],["Türkmenistan","+993"],["Uganda","+256"],["Ukrayna","+380"],["Umman","+968"],
+    ["Uruguay","+598"],["Ürdün","+962"],["Vanuatu","+678"],["Venezuela","+58"],["Vietnam","+84"],
+    ["Yemen","+967"],["Yeni Zelanda","+64"],["Yunanistan","+30"],["Zambiya","+260"],["Zimbabve","+263"],
+    ["İngiltere","+44"]
+  ];
+
+  var dialEl = document.getElementById('dialCode');
+  COUNTRIES.forEach(function(c) {
+    var o = document.createElement('option');
+    o.value = c[1];
+    o.textContent = c[0] + ' (' + c[1] + ')';
+    dialEl.appendChild(o);
+  });
+  dialEl.value = '+90';
+
+  // Yerel numarayi bicimle: 10 hane -> 546 269 23 09; digerleri 3'lu gruplar
+  function fmtLocal(d) {
+    if (d.length === 10) return d.slice(0,3)+' '+d.slice(3,6)+' '+d.slice(6,8)+' '+d.slice(8,10);
+    return d.replace(/(\d{3})(?=\d)/g, '$1 ').trim();
+  }
+
   var nameEl = document.getElementById('fullName');
   var titleEl = document.getElementById('title');
   var emailEl = document.getElementById('email');
@@ -271,14 +339,20 @@
       name: nameEl.value.trim() || 'Talha DUYGU',
       title: titleEl.value.trim() || 'Technical Quality & SMS Engineer',
       email: emailEl.value.trim() || 'tduygu@bonair.com.tr',
-      phone: phoneEl.value.trim() || '+90 546 269 23 09'
+      phone: (function() {
+        var d = phoneEl.value.replace(/\D/g, '');
+        return d ? dialEl.value + ' ' + fmtLocal(d) : '+90 546 269 23 09';
+      })()
     };
   }
 
   function isReady() {
     var emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailEl.value.trim());
     emailEl.classList.toggle('invalid', emailEl.value.trim() !== '' && !emailOk);
-    return nameEl.value.trim() !== '' && titleEl.value.trim() !== '' && emailOk && phoneEl.value.trim() !== '';
+    var pd = phoneEl.value.replace(/\D/g, '');
+    var phoneOk = dialEl.value === '+90' ? pd.length === 10 : pd.length >= 6;
+    phoneEl.classList.toggle('invalid', pd.length > 0 && !phoneOk);
+    return nameEl.value.trim() !== '' && titleEl.value.trim() !== '' && emailOk && phoneOk;
   }
 
   function render() {
@@ -335,7 +409,13 @@
     } else { fallbackCopy(); }
   });
 
-  [nameEl, titleEl, emailEl, phoneEl].forEach(function(el) { el.addEventListener('input', render); });
+  [nameEl, titleEl, emailEl].forEach(function(el) { el.addEventListener('input', render); });
+  phoneEl.addEventListener('input', function() {
+    var d = phoneEl.value.replace(/\D/g, '').replace(/^0+/, '').slice(0, 12);
+    phoneEl.value = fmtLocal(d);
+    render();
+  });
+  dialEl.addEventListener('change', render);
 
   // Fontlar + sablon hazir olunca ilk cizim. Fontlarin GERCEKTEN indigi
   // dogrulanmadan fotograf uretilmez (yanlis fontlu imza olusmasin).
