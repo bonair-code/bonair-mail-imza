@@ -43,6 +43,14 @@
     font-size: 14px; font-family: inherit; outline: none; transition: border-color .15s;
   }
   .form-group input:focus { border-color: #4A90D9; }
+  .email-row { display: flex; align-items: stretch; }
+  .email-row input { flex: 1; min-width: 0; border-radius: 9px 0 0 9px; border-right: none; }
+  .email-suffix {
+    display: flex; align-items: center; padding: 0 12px;
+    background: #1E3355; color: #B9C8DD; font-size: 14px; font-weight: 600;
+    border: 1px solid #2A4166; border-left: none; border-radius: 0 9px 9px 0;
+    white-space: nowrap;
+  }
   .phone-row { display: flex; gap: 8px; }
   .phone-row select {
     width: 118px; flex: none; padding: 11px 6px; border-radius: 9px;
@@ -108,7 +116,11 @@
       </div>
       <div class="form-group">
         <label for="email">E-posta</label>
-        <input id="email" type="email" placeholder="tduygu@bonair.com.tr" autocomplete="email" maxlength="50">
+        <div class="email-row">
+          <input id="email" type="text" placeholder="tduygu" autocomplete="off" maxlength="40" spellcheck="false">
+          <span class="email-suffix">@bonair.com.tr</span>
+        </div>
+        <div class="hint">Sadece kullanıcı adınızı yazın; uzantı sabittir.</div>
       </div>
       <div class="form-group">
         <label for="phone">Telefon</label>
@@ -338,7 +350,7 @@
     return {
       name: nameEl.value.trim() || 'Talha DUYGU',
       title: titleEl.value.trim() || 'Technical Quality & SMS Engineer',
-      email: emailEl.value.trim() || 'tduygu@bonair.com.tr',
+      email: (emailEl.value.trim() || 'tduygu') + '@bonair.com.tr',
       phone: (function() {
         var d = phoneEl.value.replace(/\D/g, '');
         return d ? dialEl.value + ' ' + fmtLocal(d) : '+90 546 269 23 09';
@@ -347,7 +359,7 @@
   }
 
   function isReady() {
-    var emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailEl.value.trim());
+    var emailOk = /^[a-z0-9][a-z0-9._-]{1,}$/.test(emailEl.value.trim());
     emailEl.classList.toggle('invalid', emailEl.value.trim() !== '' && !emailOk);
     var pd = phoneEl.value.replace(/\D/g, '');
     var phoneOk = dialEl.value === '+90' ? pd.length === 10 : pd.length >= 6;
@@ -409,7 +421,12 @@
     } else { fallbackCopy(); }
   });
 
-  [nameEl, titleEl, emailEl].forEach(function(el) { el.addEventListener('input', render); });
+  [nameEl, titleEl].forEach(function(el) { el.addEventListener('input', render); });
+  emailEl.addEventListener('input', function() {
+    var v = emailEl.value.toLowerCase().split('@')[0].replace(/[^a-z0-9._-]/g, '');
+    if (v !== emailEl.value) emailEl.value = v;
+    render();
+  });
   phoneEl.addEventListener('input', function() {
     var d = phoneEl.value.replace(/\D/g, '').replace(/^0+/, '').slice(0, 12);
     phoneEl.value = fmtLocal(d);
