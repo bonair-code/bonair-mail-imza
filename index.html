@@ -71,6 +71,12 @@
   .steps { margin-top: 18px; font-size: 13px; color: #8FA3BF; line-height: 1.7; }
   .steps strong { color: #B9C8DD; }
   .steps ol { padding-left: 18px; margin-top: 6px; }
+  .steps ol li { margin-bottom: 4px; }
+  .guide { background: #0A1628; border: 1px solid #1E3355; border-radius: 9px; padding: 10px 14px; margin-top: 10px; }
+  .guide summary { cursor: pointer; font-weight: 700; color: #B9C8DD; font-size: 13px; }
+  .guide summary:hover { color: #E8EDF4; }
+  .guide[open] summary { margin-bottom: 6px; }
+  .dim { color: #5F7494; font-size: 12px; }
 </style>
 </head>
 <body>
@@ -118,11 +124,41 @@
       </div>
       <div class="steps">
         <strong>Nasıl kullanılır?</strong>
-        <ol>
-          <li><strong>Outlook:</strong> "İmzayı Kopyala" → Ayarlar → İmzalar → Yeni imza → kutuya yapıştırın (Ctrl+V).</li>
-          <li><strong>Gmail:</strong> "Fotoğrafı İndir" → Gmail Ayarlar → İmza → resim ekle simgesi → <em>Yükle</em> sekmesinden indirdiğiniz PNG'yi seçin.</li>
-          <li>Sosyal medya ikonlarının tıklanabilir olması için "İmzayı Kopyala" yolunu kullanın.</li>
-        </ol>
+        <details class="guide" open>
+          <summary>Outlook (Yeni Outlook / Web) — adım adım</summary>
+          <ol>
+            <li>Bu sayfada bilgilerinizi doldurun ve <strong>"İmzayı Kopyala"</strong> düğmesine basın. ("Kopyalandı" bildirimi çıkar.)</li>
+            <li>Outlook'u açın, sağ üstteki <strong>⚙️ Ayarlar</strong> simgesine tıklayın.</li>
+            <li><strong>Hesaplar → İmzalar</strong> bölümüne gidin. <span class="dim">(Web'de: E-posta → Oluştur ve yanıtla)</span></li>
+            <li><strong>+ Yeni imza</strong>'ya tıklayın, imzaya bir ad verin (örn. <em>Bonair</em>).</li>
+            <li>Alttaki büyük metin kutusuna tıklayın ve <strong>Ctrl+V</strong> (Mac: Cmd+V) ile yapıştırın. İmza fotoğrafı ve ikonlar kutuda görünmeli.</li>
+            <li>Aynı sayfadaki <strong>"Yeni iletiler için"</strong> ve <strong>"Yanıtlar/iletmeler için"</strong> listelerinden bu imzayı seçin.</li>
+            <li><strong>Kaydet</strong>'e basın. Yeni bir mail açıp imzanın geldiğini kontrol edin.</li>
+          </ol>
+        </details>
+        <details class="guide">
+          <summary>Klasik Outlook (masaüstü program) — adım adım</summary>
+          <ol>
+            <li>Bu sayfada <strong>"İmzayı Kopyala"</strong> düğmesine basın.</li>
+            <li>Outlook'ta <strong>Dosya → Seçenekler → Posta → İmzalar...</strong> yolunu izleyin.</li>
+            <li><strong>Yeni</strong>'ye tıklayın, imzaya bir ad verin (örn. <em>Bonair</em>), Tamam deyin.</li>
+            <li>Düzenleme kutusuna tıklayıp <strong>Ctrl+V</strong> ile yapıştırın.</li>
+            <li>Sağ üstteki <strong>"Yeni iletiler"</strong> (ve isterseniz "Yanıtlar/iletmeler") için bu imzayı seçin.</li>
+            <li><strong>Tamam</strong> ile kaydedin.</li>
+          </ol>
+        </details>
+        <details class="guide">
+          <summary>Gmail — adım adım</summary>
+          <ol>
+            <li>Bu sayfada <strong>"Fotoğrafı İndir (PNG)"</strong> düğmesine basın; imza fotoğrafı bilgisayarınıza iner.</li>
+            <li>Gmail'de sağ üstteki <strong>⚙️ → Tüm ayarları göster</strong>'e tıklayın.</li>
+            <li><strong>Genel</strong> sekmesinde <strong>İmza → + Yeni oluştur</strong>'a tıklayın, ad verin.</li>
+            <li>İmza kutusunun altındaki <strong>resim ekle</strong> simgesine tıklayın → <strong>Yükle</strong> sekmesinden indirdiğiniz PNG'yi seçin.</li>
+            <li><strong>İmza varsayılanları</strong> bölümünde yeni imzayı seçin.</li>
+            <li>Sayfanın en altındaki <strong>Değişiklikleri Kaydet</strong>'e basın.</li>
+          </ol>
+        </details>
+        <div class="dim" style="margin-top:8px;">Not: Sosyal medya ikonlarının tıklanabilir olması için "İmzayı Kopyala" yolunu tercih edin.</div>
       </div>
     </div>
   </div>
