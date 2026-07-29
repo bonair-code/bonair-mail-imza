@@ -106,9 +106,14 @@
     <div class="card">
       <h2>Bilgileriniz</h2>
       <div class="form-group">
-        <label for="fullName">Ad Soyad</label>
-        <input id="fullName" type="text" placeholder="Talha DUYGU" autocomplete="name" maxlength="40">
-        <div class="hint">Taslaktaki gibi soyadı BÜYÜK yazabilirsiniz.</div>
+        <label for="firstName">Ad</label>
+        <input id="firstName" type="text" placeholder="Talha" autocomplete="given-name" maxlength="25">
+        <div class="hint">İlk harfler otomatik büyütülür (örn. "cevdet berkan" → "Cevdet Berkan").</div>
+      </div>
+      <div class="form-group">
+        <label for="lastName">Soyad</label>
+        <input id="lastName" type="text" placeholder="DUYGU" autocomplete="family-name" maxlength="25">
+        <div class="hint">Otomatik BÜYÜK harfe çevrilir.</div>
       </div>
       <div class="form-group">
         <label for="title">Unvan</label>
@@ -320,6 +325,14 @@
     ["İngiltere","+44"]
   ];
 
+  // Turkce karakter kurallariyla (i->İ, I->ı) bicimleme
+  function trUpper(t) { return t.toLocaleUpperCase('tr-TR'); }
+  function trLower(t) { return t.toLocaleLowerCase('tr-TR'); }
+  // Her kelimenin ilk harfi buyuk, kalani kucuk: "cevdet berkan" -> "Cevdet Berkan"
+  function nameCase(t) {
+    return trLower(t).replace(/(^|\s)(\S)/g, function(m, sp, ch) { return sp + trUpper(ch); });
+  }
+
   var dialEl = document.getElementById('dialCode');
   COUNTRIES.forEach(function(c) {
     var o = document.createElement('option');
@@ -335,7 +348,8 @@
     return d.replace(/(\d{3})(?=\d)/g, '$1 ').trim();
   }
 
-  var nameEl = document.getElementById('fullName');
+  var firstEl = document.getElementById('firstName');
+  var lastEl = document.getElementById('lastName');
   var titleEl = document.getElementById('title');
   var emailEl = document.getElementById('email');
   var phoneEl = document.getElementById('phone');
@@ -348,7 +362,7 @@
 
   function values() {
     return {
-      name: nameEl.value.trim() || 'Talha DUYGU',
+      name: ((nameCase(firstEl.value.trim()) || 'Talha') + ' ' + (trUpper(lastEl.value.trim()) || 'DUYGU')).trim(),
       title: titleEl.value.trim() || 'Technical Quality & SMS Engineer',
       email: (emailEl.value.trim() || 'tduygu') + '@bonair.com.tr',
       phone: (function() {
@@ -364,7 +378,7 @@
     var pd = phoneEl.value.replace(/\D/g, '');
     var phoneOk = dialEl.value === '+90' ? pd.length === 10 : pd.length >= 6;
     phoneEl.classList.toggle('invalid', pd.length > 0 && !phoneOk);
-    return nameEl.value.trim() !== '' && titleEl.value.trim() !== '' && emailOk && phoneOk;
+    return firstEl.value.trim() !== '' && lastEl.value.trim() !== '' && titleEl.value.trim() !== '' && emailOk && phoneOk;
   }
 
   function render() {
@@ -421,7 +435,19 @@
     } else { fallbackCopy(); }
   });
 
-  [nameEl, titleEl].forEach(function(el) { el.addEventListener('input', render); });
+  firstEl.addEventListener('input', function() {
+    var pos = firstEl.selectionStart;
+    firstEl.value = nameCase(firstEl.value);
+    firstEl.setSelectionRange(pos, pos);
+    render();
+  });
+  lastEl.addEventListener('input', function() {
+    var pos = lastEl.selectionStart;
+    lastEl.value = trUpper(lastEl.value);
+    lastEl.setSelectionRange(pos, pos);
+    render();
+  });
+  titleEl.addEventListener('input', render);
   emailEl.addEventListener('input', function() {
     var v = emailEl.value.toLowerCase().split('@')[0].replace(/[^a-z0-9._-]/g, '');
     if (v !== emailEl.value) emailEl.value = v;
