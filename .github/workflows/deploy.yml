@@ -1,0 +1,31 @@
+name: Firebase Hosting'e yayınla
+
+# main dalina her degisiklik gonderildiginde site otomatik guncellenir.
+# Calismasi icin tek seferlik FIREBASE_TOKEN secret'i eklenmelidir (bkz. README).
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:        # Actions sekmesinden elle de calistirilabilir
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Firebase CLI kur
+        run: npm install -g firebase-tools
+
+      - name: Token kontrolu
+        run: |
+          if [ -z "${{ secrets.FIREBASE_TOKEN }}" ]; then
+            echo "::error::FIREBASE_TOKEN secret'i tanimli degil. Kurulum icin README > 'Otomatik yayin kurulumu' bolumune bakin."
+            exit 1
+          fi
+
+      - name: Yayınla
+        run: firebase deploy --only hosting --non-interactive --token "${{ secrets.FIREBASE_TOKEN }}"
