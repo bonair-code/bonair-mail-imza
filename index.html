@@ -232,6 +232,26 @@
   var DISCLAIMER_EN = 'DISCLAIMER: This email and its attachments are confidential and intended solely for the named recipient(s). If you have received this message in error, please notify the sender and delete it. Forwarding, copying or using any part of this message without the sender\'s knowledge and consent is strictly prohibited. Bonair Havacılık Tic. ve San. A.Ş. and its subsidiaries accept no liability for the accuracy, currency or binding nature of this email or its contents, for any third-party personal data it may contain, or for any damage this email may cause to your computer system.';
   var WEB_URL = 'https://bonair.com.tr/';
   var WEB_TEXT = 'www.bonair.com.tr';   // imzada goruntulenen web adresi (sabit)
+
+  // ---- GECICI DUYURU HANESI --------------------------------------------
+  // Imzanin altinda, gizlilik metninin ustunde cikan gecici duyuru gorseli.
+  // Fuar katilimi, bakim/sistem duyurusu, bayram mesaji vb. icin kullanilir.
+  //
+  //   aktif: true  -> yeni olusturulan imzalarda duyuru gorunur
+  //   aktif: false -> yeni olusturulan imzalarda duyuru hic eklenmez
+  //
+  // Duyurunun gorseli 'imza-duyuru.png' dosyasidir. Bu DOSYA ADI SABIT
+  // kalmalidir: dosyayi ayni adla degistirince, imzasini daha once kopyalamis
+  // olan herkesin imzasindaki duyuru da kendiliginden guncellenir.
+  // Ayrintili kullanim: README > "Gecici duyuru hanesi".
+  var DUYURU = {
+    aktif: false,                 // duyuru yayinda mi?
+    img:   'imza-duyuru.png',     // DEGISTIRMEYIN
+    url:   '',                    // tiklaninca gidecek adres (bos ise link olmaz)
+    alt:   'Bonair duyuru'        // gorsel yuklenmezse gorunecek yazi
+  };
+  var DUYURU_W = 620;   // duyurunun imzadaki olculeri (px) - DEGISTIRMEYIN
+  var DUYURU_H = 80;    // gorseli 1240x160 px hazirlayin (bkz. README)
   var TXT = '#787878';   // sablondaki metin grisi
   var PHOTO_W = 620;     // imza fotografinin mail icindeki genisligi (px)
 
@@ -313,6 +333,17 @@
       : '<td width="' + PHOTO_W + '" valign="top" style="width:' + PHOTO_W + 'px;vertical-align:top;">' +
           '<img src="' + photoSrc + '" alt="Bonair" width="' + PHOTO_W + '" height="' + PHOTO_H + '" border="0" style="display:block;width:' + PHOTO_W + 'px;height:' + PHOTO_H + 'px;border:0;">' +
         '</td>';
+    // Gecici duyuru satiri (DUYURU.aktif false ise hic uretilmez)
+    var duyuruRow = '';
+    if (DUYURU && DUYURU.aktif) {
+      var dImg = responsive
+        ? '<img src="' + iconBase + DUYURU.img + '" alt="' + esc(DUYURU.alt) + '" style="display:block;width:100%;max-width:' + DUYURU_W + 'px;height:auto;border:0;">'
+        : '<img src="' + iconBase + DUYURU.img + '" alt="' + esc(DUYURU.alt) + '" width="' + DUYURU_W + '" height="' + DUYURU_H + '" border="0" style="display:block;width:' + DUYURU_W + 'px;height:' + DUYURU_H + 'px;border:0;">';
+      if (DUYURU.url) {
+        dImg = '<a href="' + DUYURU.url + '" target="_blank" style="text-decoration:none;border:0;">' + dImg + '</a>';
+      }
+      duyuruRow = '<tr><td colspan="3" style="padding:12px 0 0 0;">' + dImg + '</td></tr>';
+    }
     return '' +
     '<table cellpadding="0" cellspacing="0" border="0" ' + tableAttrs + '>' +
       '<tr>' +
@@ -322,6 +353,7 @@
           '<table cellpadding="0" cellspacing="0" border="0" width="24" style="border-collapse:collapse;">' + iconRows + '</table>' +
         '</td>' +
       '</tr>' +
+      duyuruRow +
       '<tr>' +
         '<td colspan="3" style="padding:10px 0 0 0;">' +
           '<font face="Aptos, Calibri, Arial, sans-serif" size="1" color="#ADB2B8">' +

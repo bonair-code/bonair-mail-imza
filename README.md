@@ -38,6 +38,114 @@ Dosyayı açıp **Ctrl+F** ile aşağıdaki kelimeyi aratın:
 ⚠️ **Dikkat:** Tırnak işaretlerini (`'`) silmeyin, sadece aralarındaki
 adresi değiştirin. Satır sonundaki virgülü de silmeyin.
 
+---
+
+# 📢 GEÇİCİ DUYURU HANESİ
+
+İmzanın altında, gizlilik metninin üstünde duran **geçici duyuru alanı**.
+Fuar katılımı, bakım/sistem duyurusu, bayram mesajı — ne isterseniz.
+
+```
+┌──────────────────────────────────────┬────┐
+│  Talha DUYGU                         │ ig │
+│  Technical Quality & SMS Engineer    │ in │
+│  +90 546 269 23 09                   │ 🌐 │
+│  tduygu@bonair.com.tr                │pdf │
+├───────────────────────────────────────────┤
+│  ▌ FUAR KATILIMI                          │  ← DUYURU HANESİ
+│  ▌ MRO Middle East 2026        STAND      │
+│  ▌ 3–4 Şubat 2026 · Dubai      B-114      │
+├───────────────────────────────────────────┤
+│  UYARI: Bu elektronik posta ve ekleri...  │
+└───────────────────────────────────────────┘
+```
+
+## ⭐ En önemli kural: dosya adı `imza-duyuru.png` olarak KALMALI
+
+Duyuru görseli imzanın içine gömülmez — **sunucudan çekilir.** Bu sayede:
+
+> Dosyayı **aynı adla** değiştirdiğinizde, imzasını çoktan kopyalamış olan
+> **herkesin Outlook'undaki duyuru da kendiliğinden değişir.**
+> Kimsenin imzasını yeniden oluşturmasına gerek kalmaz.
+
+Dosya adını değiştirirseniz bu özellik bozulur ve 100+ kişiye
+"imzanızı yenileyin" maili atmanız gerekir. **Değiştirmeyin.**
+
+## 1. Duyuru görselini hazırlama
+
+| Kural | Değer |
+|---|---|
+| Ölçü | **1240 × 160 piksel** (imzada 620 × 80 görünür) |
+| Format | PNG |
+| Dosya adı | `imza-duyuru.png` |
+| Dosya boyutu | 300 KB altı olsun (mailde hızlı yüklensin) |
+
+Depodaki **`ornek-duyuru.png`** hazır bir şablondur — Canva'ya yükleyip
+üstündeki yazıları değiştirerek kullanabilirsiniz.
+(Kurumsal dil: Montserrat, Bonair kırmızısı `#E2201C`, beyaz zemin.)
+
+## 2. Duyuruyu AÇMA
+
+**Adım 1 — Görseli yükleyin**
+
+1. https://github.com/bonair-code/bonair-mail-imza adresine gidin
+2. Üstteki **Add file ▾ → Upload files**
+3. Hazırladığınız görseli sürükleyin — **adı `imza-duyuru.png` olmalı**
+4. Altta **Commit changes**
+
+**Adım 2 — Duyuruyu aktif edin**
+
+1. `index.html` dosyasına tıklayın → sağ üstteki **kalem (✏️)**
+2. **Ctrl+F** ile `aktif:` aratın, şu bloğu bulun:
+
+```js
+var DUYURU = {
+  aktif: false,                 // duyuru yayinda mi?
+  img:   'imza-duyuru.png',     // DEGISTIRMEYIN
+  url:   '',                    // tiklaninca gidecek adres (bos ise link olmaz)
+  alt:   'Bonair duyuru'        // gorsel yuklenmezse gorunecek yazi
+};
+```
+
+3. `false` → **`true`** yapın
+4. Tıklanınca bir yere gitsin istiyorsanız `url` kısmını doldurun:
+   `url: 'https://bonair.com.tr/fuar',` — istemiyorsanız boş bırakın
+5. **Commit changes**
+
+**Adım 3 — Kontrol**
+
+1–2 dakika sonra siteyi **Ctrl+F5** ile açın, imzayı oluşturun; duyuru
+görünüyor olmalı.
+
+## 3. Duyuruyu KAPATMA
+
+Kapatma **iki yerden** yapılır, çünkü iki ayrı kitle var:
+
+| Kim | Ne yapmalı | Niçin |
+|---|---|---|
+| **Bundan sonra** imza oluşturacaklar | `index.html` → `aktif: true` → **`false`** | Yeni imzalarda duyuru hiç eklenmez |
+| İmzasını **zaten kopyalamış** olanlar | `imza-duyuru-bos.png`'i indirip adını `imza-duyuru.png` yapıp yükleyin | Onların imzasındaki görsel boşalır |
+
+İkisini birlikte yapın; duyuru tamamen kalkar.
+
+> `imza-duyuru-bos.png` depoda hazır duruyor — tamamen şeffaf bir görsel.
+> İndirip adını değiştirip yüklemeniz yeterli.
+>
+> ⚠️ Kapattıktan sonra eski imzalarda duyurunun yerinde ~80px'lik **boş bir
+> alan** kalır. Gözle fark edilmez (hemen altında gizlilik metni var).
+> Tamamen sıfırlamak isterseniz tek bir "imzanızı yenileyin" maili gerekir.
+
+## 4. Bilinmesi gerekenler
+
+- **Outlook harici görselleri bloklayabilir.** Alıcı sizi tanımıyorsa duyuru
+  yerine boş kutu görüp "Resimleri indir"e basması gerekebilir. Mevcut
+  sosyal medya ikonlarında da aynı durum var — yeni bir sorun değil.
+- Görseli **çok yazıyla doldurmayın.** İmzada 620px genişliğinde görünür;
+  3 satırdan fazlası okunmaz.
+- Duyuru **herkeste otomatik** çıkar; kişi başına açıp kapatma yoktur.
+
+---
+
 ## 2. Değişikliği nasıl yayınlarım?
 
 ### Yol A — GitHub üzerinden (en kolay, bilgisayara kurulum gerekmez)
@@ -119,6 +227,9 @@ gerekmez — yeter ki `imza-*.png` dosyaları site köküne deploy edilsin.
 |---|---|
 | `index.html` | Uygulamanın tamamı (form + imza üreteci + yönergeler) |
 | `imza-sablon.png` | İmzanın boş şablonu (logo, hangar, ikonlar, adres) |
+| `imza-duyuru.png` | **Geçici duyuru görseli** — bkz. "Geçici duyuru hanesi" |
+| `imza-duyuru-bos.png` | Duyuruyu kapatmak için şeffaf yedek görsel |
+| `ornek-duyuru.png` | Duyuru için hazır tasarım şablonu |
 | `imza-ig / in / globe / pdf .png` | Sosyal ve link ikonları (tıklanabilir) |
 | `fonts/` | Montserrat yazı tipi (imza fotoğrafında kullanılır) |
 | `firebase.json`, `.firebaserc` | Firebase Hosting ayarları |
