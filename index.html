@@ -237,21 +237,25 @@
   // Imzanin altinda, gizlilik metninin ustunde cikan gecici duyuru gorseli.
   // Fuar katilimi, bakim/sistem duyurusu, bayram mesaji vb. icin kullanilir.
   //
-  //   aktif: true  -> yeni olusturulan imzalarda duyuru gorunur
-  //   aktif: false -> yeni olusturulan imzalarda duyuru hic eklenmez
+  // DUYURU BURADAN YONETILMEZ. Portal > Mail Imzasi sayfasindan yayinlanir;
+  // bu dosyada acip kapatilacak bir anahtar YOKTUR (bilerek).
   //
-  // Duyurunun gorseli 'imza-duyuru.png' dosyasidir. Bu DOSYA ADI SABIT
-  // kalmalidir: dosyayi ayni adla degistirince, imzasini daha once kopyalamis
-  // olan herkesin imzasindaki duyuru da kendiliginden guncellenir.
-  // Ayrintili kullanim: README > "Gecici duyuru hanesi".
-  var DUYURU = {
-    aktif: false,                 // duyuru yayinda mi?
-    img:   'imza-duyuru.png',     // DEGISTIRMEYIN
-    url:   '',                    // tiklaninca gidecek adres (bos ise link olmaz)
-    alt:   'Bonair duyuru'        // gorsel yuklenmezse gorunecek yazi
-  };
-  var DUYURU_W = 620;   // duyurunun imzadaki olculeri (px) - DEGISTIRMEYIN
-  var DUYURU_H = 80;    // gorseli 1240x160 px hazirlayin (bkz. README)
+  // CALISMA SEKLI:
+  // Imzaya her zaman tek satirlik bir duyuru hanesi konur ve o hane sabit bir
+  // adrese bakar (asagidaki DUYURU_IMG). Portaldan yeni gorsel yuklendiginde
+  // ayni adrese yazildigi icin duyuru, imzasini DAHA ONCE kopyalamis olan
+  // herkeste de kendiliginden degisir.
+  //
+  // DUYURU YOKKEN: o adreste 1240x2 SEFFAF bir gorsel durur. Imzada yuksekligi
+  // ~1px olur, yani goze gorunmez. YUKSEKLIK ATTRIBUTE'U BILEREK VERILMIYOR —
+  // sabit height verilseydi duyuru kapaliyken her imzada 80px bos bir seride
+  // kalirdi. Genislik sabit (620), yukseklik gorselden gelir.
+  var DUYURU_IMG  = 'https://firebasestorage.googleapis.com/v0/b/bonappetit-c2db2.firebasestorage.app/o/mail-imza%2Fduyuru.png?alt=media';
+  var DUYURU_META = 'https://firebasestorage.googleapis.com/v0/b/bonappetit-c2db2.firebasestorage.app/o/mail-imza%2Fduyuru.json?alt=media';
+  var DUYURU_W = 620;   // duyurunun imzadaki genisligi (px) - DEGISTIRMEYIN
+  // Portaldan okunan duyuru bilgisi. Yalniz LINK icin kullanilir: gorselin
+  // kendisi her halukarda basilir, boylece meta okunamasa bile duyuru gorunur.
+  var duyuruMeta = null;
   var TXT = '#787878';   // sablondaki metin grisi
   var PHOTO_W = 620;     // imza fotografinin mail icindeki genisligi (px)
 
@@ -333,17 +337,20 @@
       : '<td width="' + PHOTO_W + '" valign="top" style="width:' + PHOTO_W + 'px;vertical-align:top;">' +
           '<img src="' + photoSrc + '" alt="Bonair" width="' + PHOTO_W + '" height="' + PHOTO_H + '" border="0" style="display:block;width:' + PHOTO_W + 'px;height:' + PHOTO_H + 'px;border:0;">' +
         '</td>';
-    // Gecici duyuru satiri (DUYURU.aktif false ise hic uretilmez)
-    var duyuruRow = '';
-    if (DUYURU && DUYURU.aktif) {
-      var dImg = responsive
-        ? '<img src="' + iconBase + DUYURU.img + '" alt="' + esc(DUYURU.alt) + '" style="display:block;width:100%;max-width:' + DUYURU_W + 'px;height:auto;border:0;">'
-        : '<img src="' + iconBase + DUYURU.img + '" alt="' + esc(DUYURU.alt) + '" width="' + DUYURU_W + '" height="' + DUYURU_H + '" border="0" style="display:block;width:' + DUYURU_W + 'px;height:' + DUYURU_H + 'px;border:0;">';
-      if (DUYURU.url) {
-        dImg = '<a href="' + DUYURU.url + '" target="_blank" style="text-decoration:none;border:0;">' + dImg + '</a>';
-      }
-      duyuruRow = '<tr><td colspan="3" style="padding:12px 0 0 0;">' + dImg + '</td></tr>';
+    // Duyuru hanesi — HER ZAMAN basilir, icerigi portal belirler.
+    // height attribute'u YOK: duyuru kapaliyken adreste 1240x2 seffaf gorsel
+    // durur ve hane ~1px'e iner. Sabit height verilseydi kapali duyuru her
+    // imzada 80px'lik bos bir serit birakirdi.
+    var dImg = responsive
+      ? '<img src="' + DUYURU_IMG + '" alt="" style="display:block;width:100%;max-width:' + DUYURU_W + 'px;height:auto;border:0;">'
+      : '<img src="' + DUYURU_IMG + '" alt="" width="' + DUYURU_W + '" border="0" style="display:block;width:' + DUYURU_W + 'px;height:auto;border:0;">';
+    // Link yalniz portal "aktif + adres" bildirdiyse eklenir. Meta okunamazsa
+    // gorsel yine basilir (duyuru gorunur, sadece tiklanamaz) — duyurunun hic
+    // cikmamasindansa tiklanamamasi yeglenir.
+    if (duyuruMeta && duyuruMeta.aktif && duyuruMeta.url) {
+      dImg = '<a href="' + esc(duyuruMeta.url) + '" target="_blank" style="text-decoration:none;border:0;">' + dImg + '</a>';
     }
+    var duyuruRow = '<tr><td colspan="3" style="padding:12px 0 0 0;font-size:0;line-height:0;">' + dImg + '</td></tr>';
     return '' +
     '<table cellpadding="0" cellspacing="0" border="0" ' + tableAttrs + '>' +
       '<tr>' +
@@ -568,6 +575,14 @@
     });
   }
   loadFonts();
+
+  // Portaldaki duyuru bilgisini oku. YALNIZ LINK icindir: gorsel her halukarda
+  // basildigi icin bu istek basarisiz olsa da duyuru imzada gorunur, sadece
+  // tiklanamaz. Bu yuzden hata sessiz gecilir ve render engellenmez.
+  fetch(DUYURU_META, { cache: 'no-store' })
+    .then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(m) { if (m) { duyuruMeta = m; render(); } })
+    .catch(function() { /* duyuru hic yayinlanmamis veya ag yok — sorun degil */ });
 })();
 </script>
 </body>
