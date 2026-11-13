@@ -246,13 +246,14 @@
   // ayni adrese yazildigi icin duyuru, imzasini DAHA ONCE kopyalamis olan
   // herkeste de kendiliginden degisir.
   //
-  // DUYURU YOKKEN: o adreste 1240x2 SEFFAF bir gorsel durur. Imzada yuksekligi
-  // ~1px olur, yani goze gorunmez. YUKSEKLIK ATTRIBUTE'U BILEREK VERILMIYOR —
-  // sabit height verilseydi duyuru kapaliyken her imzada 80px bos bir seride
-  // kalirdi. Genislik sabit (620), yukseklik gorselden gelir.
+  // DUYURU YOKKEN: o adreste ayni olcude (1240x160) SEFFAF bir gorsel durur,
+  // yani imzada 620x80'lik bos bir alan kalir. Bu bir tercih degil, zorunluluk:
+  // Outlook gorseli ancak HEIGHT yazarsa ciziyor (bkz. buildSignature icindeki
+  // not), sabit yukseklik de kopyalandiktan sonra degistirilemiyor.
   var DUYURU_IMG  = 'https://firebasestorage.googleapis.com/v0/b/bonappetit-c2db2.firebasestorage.app/o/mail-imza%2Fduyuru.png?alt=media';
   var DUYURU_META = 'https://firebasestorage.googleapis.com/v0/b/bonappetit-c2db2.firebasestorage.app/o/mail-imza%2Fduyuru.json?alt=media';
-  var DUYURU_W = 620;   // duyurunun imzadaki genisligi (px) - DEGISTIRMEYIN
+  var DUYURU_W = 620;   // duyurunun imzadaki olculeri (px) - DEGISTIRMEYIN
+  var DUYURU_H = 80;    // gorsel 1240x160 hazirlanir, imzada yariya iner
   // Portaldan okunan duyuru bilgisi. Yalniz LINK icin kullanilir: gorselin
   // kendisi her halukarda basilir, boylece meta okunamasa bile duyuru gorunur.
   var duyuruMeta = null;
@@ -338,12 +339,18 @@
           '<img src="' + photoSrc + '" alt="Bonair" width="' + PHOTO_W + '" height="' + PHOTO_H + '" border="0" style="display:block;width:' + PHOTO_W + 'px;height:' + PHOTO_H + 'px;border:0;">' +
         '</td>';
     // Duyuru hanesi — HER ZAMAN basilir, icerigi portal belirler.
-    // height attribute'u YOK: duyuru kapaliyken adreste 1240x2 seffaf gorsel
-    // durur ve hane ~1px'e iner. Sabit height verilseydi kapali duyuru her
-    // imzada 80px'lik bos bir serit birakirdi.
+    //
+    // HEIGHT ZORUNLU — 2026-11-13'te gercek Outlook'ta ogrenildi.
+    // Once height verilmemisti (duyuru kapaliyken bosluk kalmasin diye).
+    // Sonuc: Outlook'ta duyuru HIC CIKMADI. Word motoru yapistirma aninda
+    // gorseli henuz indirmemis oluyor, intrinsic yuksekligi bilemiyor ve
+    // yuksekligi 0 kabul edip gorseli dusuruyor. Ayni imzadaki sosyal
+    // ikonlar cikiyordu, cunku onlarda width VE height attribute'u var.
+    // Bu yuzden slot SABIT yuksekliktedir; duyuru kapaliyken ayni olcude
+    // seffaf gorsel durur.
     var dImg = responsive
-      ? '<img src="' + DUYURU_IMG + '" alt="" style="display:block;width:100%;max-width:' + DUYURU_W + 'px;height:auto;border:0;">'
-      : '<img src="' + DUYURU_IMG + '" alt="" width="' + DUYURU_W + '" border="0" style="display:block;width:' + DUYURU_W + 'px;height:auto;border:0;">';
+      ? '<img src="' + DUYURU_IMG + '" alt="Bonair duyuru" style="display:block;width:100%;max-width:' + DUYURU_W + 'px;height:auto;border:0;">'
+      : '<img src="' + DUYURU_IMG + '" alt="Bonair duyuru" width="' + DUYURU_W + '" height="' + DUYURU_H + '" border="0" style="display:block;width:' + DUYURU_W + 'px;height:' + DUYURU_H + 'px;border:0;">';
     // Link yalniz portal "aktif + adres" bildirdiyse eklenir. Meta okunamazsa
     // gorsel yine basilir (duyuru gorunur, sadece tiklanamaz) — duyurunun hic
     // cikmamasindansa tiklanamamasi yeglenir.
