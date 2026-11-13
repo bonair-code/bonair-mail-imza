@@ -357,7 +357,7 @@
     if (duyuruMeta && duyuruMeta.aktif && duyuruMeta.url) {
       dImg = '<a href="' + esc(duyuruMeta.url) + '" target="_blank" style="text-decoration:none;border:0;">' + dImg + '</a>';
     }
-    var duyuruRow = '<tr><td colspan="3" style="padding:12px 0 0 0;font-size:0;line-height:0;">' + dImg + '</td></tr>';
+    var duyuruRow = '<tr><td colspan="3" style="padding:14px 0 0 0;font-size:0;line-height:0;">' + dImg + '</td></tr>';
     return '' +
     '<table cellpadding="0" cellspacing="0" border="0" ' + tableAttrs + '>' +
       '<tr>' +
@@ -367,7 +367,6 @@
           '<table cellpadding="0" cellspacing="0" border="0" width="24" style="border-collapse:collapse;">' + iconRows + '</table>' +
         '</td>' +
       '</tr>' +
-      duyuruRow +
       '<tr>' +
         '<td colspan="3" style="padding:10px 0 0 0;">' +
           '<font face="Aptos, Calibri, Arial, sans-serif" size="1" color="#ADB2B8">' +
@@ -376,6 +375,11 @@
           '</span></font>' +
         '</td>' +
       '</tr>' +
+      // Duyuru hanesi GIZLILIK METNININ ALTINDA (2026-11-13 kararı).
+      // Slot sabit 80px yuksekliktedir (Outlook height istiyor, bkz. yukarisi)
+      // ve duyuru kapaliyken o 80px bos kalir. En altta oldugu icin bu bosluk
+      // imzanin sonundaki bir paya donusur, imzanin ORTASINDA bir delik olmaz.
+      duyuruRow +
     '</table>';
   }
 
