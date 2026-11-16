@@ -256,12 +256,14 @@
   // imzasini yenilemesi gerekir.
   var DUYURU_IMG  = 'https://firebasestorage.googleapis.com/v0/b/bonappetit-c2db2.firebasestorage.app/o/mail-imza%2Fduyuru.png?alt=media';
   var DUYURU_META = 'https://firebasestorage.googleapis.com/v0/b/bonappetit-c2db2.firebasestorage.app/o/mail-imza%2Fduyuru.json?alt=media';
-  // 16:9 — gorsel 1240x698 hazirlanir, imzada yariya iner.
+  // ~4:1 — gorsel 1240x320 hazirlanir, imzada yariya iner.
+  // Oran, yaygin kurumsal imza afislerinden alindi (genis ve alcak); imza
+  // fotografindan (620x207) bile kisa kaldigi icin imzayi ezmiyor.
   // OLCU DEGISIRSE: imzasini onceki olcuyle kopyalamis herkesin imzasinda
   // yeni gorsel eski yukseklige ezilir. Olcu degistirildiginde personele
   // "imzanizi yenileyin" denmesi SART.
   var DUYURU_W = 620;
-  var DUYURU_H = 349;
+  var DUYURU_H = 160;
   // Portaldan okunan duyuru bilgisi. Yalniz LINK icin kullanilir: gorselin
   // kendisi her halukarda basilir, boylece meta okunamasa bile duyuru gorunur.
   var duyuruMeta = null;
