@@ -241,19 +241,27 @@
   // bu dosyada acip kapatilacak bir anahtar YOKTUR (bilerek).
   //
   // CALISMA SEKLI:
-  // Imzaya her zaman tek satirlik bir duyuru hanesi konur ve o hane sabit bir
-  // adrese bakar (asagidaki DUYURU_IMG). Portaldan yeni gorsel yuklendiginde
-  // ayni adrese yazildigi icin duyuru, imzasini DAHA ONCE kopyalamis olan
-  // herkeste de kendiliginden degisir.
+  // Duyuru hanesi, YALNIZ portalda yayinda bir duyuru varken imzaya konur
+  // (duyuru.json -> aktif). Hane sabit bir adrese bakar (DUYURU_IMG), bu
+  // yuzden portaldan AYNI olcude yeni gorsel yuklendiginde duyuru, imzasini
+  // daha once kopyalamis kullanicilarda da degisebilir.
   //
-  // DUYURU YOKKEN: o adreste ayni olcude (1240x160) SEFFAF bir gorsel durur,
-  // yani imzada 620x80'lik bos bir alan kalir. Bu bir tercih degil, zorunluluk:
-  // Outlook gorseli ancak HEIGHT yazarsa ciziyor (bkz. buildSignature icindeki
-  // not), sabit yukseklik de kopyalandiktan sonra degistirilemiyor.
+  // DUYURU YOKKEN HANE HIC BASILMAZ (2026-11-16 karari).
+  // Once hane her zaman basiliyor, duyuru yokken yerinde seffaf gorsel
+  // duruyordu. Olcu 620x80 iken bu fark edilmiyordu; 16:9'a (620x349)
+  // cikinca duyuru kapaliyken imzanin altinda ~17 satirlik bos alan kalacakti.
+  // Outlook yuksekligi kopyalama aninda sabitledigi icin bosluk sonradan
+  // kapatilamiyor — tek care haneyi hic basmamak.
+  // BEDELI: sessiz donemde imza olusturan kisi haneyi almaz; yeni kampanyada
+  // imzasini yenilemesi gerekir.
   var DUYURU_IMG  = 'https://firebasestorage.googleapis.com/v0/b/bonappetit-c2db2.firebasestorage.app/o/mail-imza%2Fduyuru.png?alt=media';
   var DUYURU_META = 'https://firebasestorage.googleapis.com/v0/b/bonappetit-c2db2.firebasestorage.app/o/mail-imza%2Fduyuru.json?alt=media';
-  var DUYURU_W = 620;   // duyurunun imzadaki olculeri (px) - DEGISTIRMEYIN
-  var DUYURU_H = 80;    // gorsel 1240x160 hazirlanir, imzada yariya iner
+  // 16:9 — gorsel 1240x698 hazirlanir, imzada yariya iner.
+  // OLCU DEGISIRSE: imzasini onceki olcuyle kopyalamis herkesin imzasinda
+  // yeni gorsel eski yukseklige ezilir. Olcu degistirildiginde personele
+  // "imzanizi yenileyin" denmesi SART.
+  var DUYURU_W = 620;
+  var DUYURU_H = 349;
   // Portaldan okunan duyuru bilgisi. Yalniz LINK icin kullanilir: gorselin
   // kendisi her halukarda basilir, boylece meta okunamasa bile duyuru gorunur.
   var duyuruMeta = null;
@@ -338,7 +346,7 @@
       : '<td width="' + PHOTO_W + '" valign="top" style="width:' + PHOTO_W + 'px;vertical-align:top;">' +
           '<img src="' + photoSrc + '" alt="Bonair" width="' + PHOTO_W + '" height="' + PHOTO_H + '" border="0" style="display:block;width:' + PHOTO_W + 'px;height:' + PHOTO_H + 'px;border:0;">' +
         '</td>';
-    // Duyuru hanesi — HER ZAMAN basilir, icerigi portal belirler.
+    // Duyuru hanesi — YALNIZ portalda yayinda duyuru varsa basilir.
     //
     // HEIGHT ZORUNLU — 2026-11-13'te gercek Outlook'ta ogrenildi.
     // Once height verilmemisti (duyuru kapaliyken bosluk kalmasin diye).
@@ -346,18 +354,20 @@
     // gorseli henuz indirmemis oluyor, intrinsic yuksekligi bilemiyor ve
     // yuksekligi 0 kabul edip gorseli dusuruyor. Ayni imzadaki sosyal
     // ikonlar cikiyordu, cunku onlarda width VE height attribute'u var.
-    // Bu yuzden slot SABIT yuksekliktedir; duyuru kapaliyken ayni olcude
-    // seffaf gorsel durur.
-    var dImg = responsive
-      ? '<img src="' + DUYURU_IMG + '" alt="Bonair duyuru" style="display:block;width:100%;max-width:' + DUYURU_W + 'px;height:auto;border:0;">'
-      : '<img src="' + DUYURU_IMG + '" alt="Bonair duyuru" width="' + DUYURU_W + '" height="' + DUYURU_H + '" border="0" style="display:block;width:' + DUYURU_W + 'px;height:' + DUYURU_H + 'px;border:0;">';
-    // Link yalniz portal "aktif + adres" bildirdiyse eklenir. Meta okunamazsa
-    // gorsel yine basilir (duyuru gorunur, sadece tiklanamaz) — duyurunun hic
-    // cikmamasindansa tiklanamamasi yeglenir.
-    if (duyuruMeta && duyuruMeta.aktif && duyuruMeta.url) {
-      dImg = '<a href="' + esc(duyuruMeta.url) + '" target="_blank" style="text-decoration:none;border:0;">' + dImg + '</a>';
+    //
+    // Yukseklik kopyalama aninda sabitlendigi icin, duyuru yokken haneyi
+    // basmak imzanin altinda DUYURU_H kadar bos alan birakirdi. 16:9 olcude
+    // bu ~17 satir eder; o yuzden hane duyuru yokken hic uretilmez.
+    var duyuruRow = '';
+    if (duyuruMeta && duyuruMeta.aktif) {
+      var dImg = responsive
+        ? '<img src="' + DUYURU_IMG + '" alt="Bonair duyuru" style="display:block;width:100%;max-width:' + DUYURU_W + 'px;height:auto;border:0;">'
+        : '<img src="' + DUYURU_IMG + '" alt="Bonair duyuru" width="' + DUYURU_W + '" height="' + DUYURU_H + '" border="0" style="display:block;width:' + DUYURU_W + 'px;height:' + DUYURU_H + 'px;border:0;">';
+      if (duyuruMeta.url) {
+        dImg = '<a href="' + esc(duyuruMeta.url) + '" target="_blank" style="text-decoration:none;border:0;">' + dImg + '</a>';
+      }
+      duyuruRow = '<tr><td colspan="3" style="padding:14px 0 0 0;font-size:0;line-height:0;">' + dImg + '</td></tr>';
     }
-    var duyuruRow = '<tr><td colspan="3" style="padding:14px 0 0 0;font-size:0;line-height:0;">' + dImg + '</td></tr>';
     return '' +
     '<table cellpadding="0" cellspacing="0" border="0" ' + tableAttrs + '>' +
       '<tr>' +
